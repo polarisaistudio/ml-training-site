@@ -1,0 +1,148 @@
+import { pgTable, serial, text, timestamp, integer, boolean, varchar, date } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+
+// Learning stages (the 5 main stages)
+export const stages = pgTable('stages', {
+  id: serial('id').primaryKey(),
+  slug: varchar('slug', { length: 100 }).notNull().unique(),
+  name: varchar('name', { length: 255 }).notNull(),
+  description: text('description'),
+  weekRange: varchar('week_range', { length: 50 }), // e.g., "Week 1-2"
+  goal: text('goal'),
+  order: integer('order').notNull().default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Content types (project, question types, etc.)
+export const contentTypes = pgTable('content_types', {
+  id: serial('id').primaryKey(),
+  slug: varchar('slug', { length: 100 }).notNull().unique(),
+  name: varchar('name', { length: 255 }).notNull(),
+  description: text('description'),
+});
+
+// Content items - base table for all content (polymorphic)
+export const contentItems = pgTable('content_items', {
+  id: serial('id').primaryKey(),
+  stageId: integer('stage_id').references(() => stages.id),
+  contentTypeId: integer('content_type_id').references(() => contentTypes.id),
+  title: varchar('title', { length: 500 }).notNull(),
+  description: text('description'),
+  difficulty: varchar('difficulty', { length: 50 }), // easy, medium, hard
+  isAvailable: boolean('is_available').default(false).notNull(),
+  order: integer('order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Questions - specific to question content
+export const questions = pgTable('questions', {
+  id: serial('id').primaryKey(),
+  contentItemId: integer('content_item_id').references(() => contentItems.id).notNull(),
+  content: text('content'), // Question content (markdown)
+  answer: text('answer'), // Answer (markdown)
+  sourceCompany: varchar('source_company', { length: 255 }),
+  isVerified: boolean('is_verified').default(false).notNull(), // Verified from real interview
+  tags: text('tags'), // JSON array of tags stored as text
+});
+
+// Projects - specific to project content
+export const projects = pgTable('projects', {
+  id: serial('id').primaryKey(),
+  contentItemId: integer('content_item_id').references(() => contentItems.id).notNull(),
+  content: text('content'), // Project tutorial content (markdown)
+  resumeBullets: text('resume_bullets'), // JSON array of resume bullet points
+  estimatedHours: integer('estimated_hours'),
+});
+
+// Interview logs - record of real interviews
+export const interviewLogs = pgTable('interview_logs', {
+  id: serial('id').primaryKey(),
+  company: varchar('company', { length: 255 }).notNull(),
+  position: varchar('position', { length: 255 }),
+  interviewDate: date('interview_date'),
+  roundType: varchar('round_type', { length: 100 }), // phone screen, onsite, etc.
+  questionsAsked: text('questions_asked'), // Free text notes about questions
+  difficulty: varchar('difficulty', { length: 50 }), // easy, medium, hard
+  result: varchar('result', { length: 100 }), // passed, failed, pending, etc.
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Question sources - link questions to interview logs
+export const questionSources = pgTable('question_sources', {
+  id: serial('id').primaryKey(),
+  questionId: integer('question_id').references(() => questions.id).notNull(),
+  interviewLogId: integer('interview_log_id').references(() => interviewLogs.id).notNull(),
+  notes: text('notes'),
+});
+
+// Relations
+export const stagesRelations = relations(stages, ({ many }) => ({
+  contentItems: many(contentItems),
+}));
+
+export const contentTypesRelations = relations(contentTypes, ({ many }) => ({
+  contentItems: many(contentItems),
+}));
+
+export const contentItemsRelations = relations(contentItems, ({ one }) => ({
+  stage: one(stages, {
+    fields: [contentItems.stageId],
+    references: [stages.id],
+  }),
+  contentType: one(contentTypes, {
+    fields: [contentItems.contentTypeId],
+    references: [contentTypes.id],
+  }),
+  question: one(questions),
+  project: one(projects),
+}));
+
+export const questionsRelations = relations(questions, ({ one, many }) => ({
+  contentItem: one(contentItems, {
+    fields: [questions.contentItemId],
+    references: [contentItems.id],
+  }),
+  sources: many(questionSources),
+}));
+
+export const projectsRelations = relations(projects, ({ one }) => ({
+  contentItem: one(contentItems, {
+    fields: [projects.contentItemId],
+    references: [contentItems.id],
+  }),
+}));
+
+export const interviewLogsRelations = relations(interviewLogs, ({ many }) => ({
+  questionSources: many(questionSources),
+}));
+
+export const questionSourcesRelations = relations(questionSources, ({ one }) => ({
+  question: one(questions, {
+    fields: [questionSources.questionId],
+    references: [questions.id],
+  }),
+  interviewLog: one(interviewLogs, {
+    fields: [questionSources.interviewLogId],
+    references: [interviewLogs.id],
+  }),
+}));
+
+// Type exports
+export type Stage = typeof stages.$inferSelect;
+export type NewStage = typeof stages.$inferInsert;
+export type ContentType = typeof contentTypes.$inferSelect;
+export type NewContentType = typeof contentTypes.$inferInsert;
+export type ContentItem = typeof contentItems.$inferSelect;
+export type NewContentItem = typeof contentItems.$inferInsert;
+export type Question = typeof questions.$inferSelect;
+export type NewQuestion = typeof questions.$inferInsert;
+export type Project = typeof projects.$inferSelect;
+export type NewProject = typeof projects.$inferInsert;
+export type InterviewLog = typeof interviewLogs.$inferSelect;
+export type NewInterviewLog = typeof interviewLogs.$inferInsert;
+export type QuestionSource = typeof questionSources.$inferSelect;
+export type NewQuestionSource = typeof questionSources.$inferInsert;
