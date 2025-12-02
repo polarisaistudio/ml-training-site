@@ -1,6 +1,6 @@
-// Re-export database types
-export type {
-  Stage,
+// Import and re-export database types
+import type {
+  Stage as StageType,
   NewStage,
   ContentType,
   NewContentType,
@@ -15,6 +15,24 @@ export type {
   QuestionSource,
   NewQuestionSource,
 } from '@/db/schema';
+
+export type {
+  NewStage,
+  ContentType,
+  NewContentType,
+  ContentItem,
+  NewContentItem,
+  Question,
+  NewQuestion,
+  Project,
+  NewProject,
+  InterviewLog,
+  NewInterviewLog,
+  QuestionSource,
+  NewQuestionSource,
+};
+
+export type Stage = StageType;
 
 // Extended types with relations
 export interface ContentItemWithRelations {
