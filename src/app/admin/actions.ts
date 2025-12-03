@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { db, contentItems, questions, interviewLogs, questionSources, stages, contentTypes } from '@/db';
+import { db, contentItems, questions, projects, interviewLogs, questionSources, stages, contentTypes } from '@/db';
 import { eq } from 'drizzle-orm';
 
 export async function createQuestion(formData: FormData) {
@@ -237,4 +237,124 @@ export async function getStagesAndContentTypes() {
   ]);
 
   return { stages: stagesList, contentTypes: contentTypesList };
+}
+
+// Project CRUD actions
+export async function createProject(formData: FormData) {
+  const title = formData.get('title') as string;
+  const description = formData.get('description') as string;
+  const stageId = formData.get('stageId') as string;
+  const difficulty = formData.get('difficulty') as string;
+  const content = formData.get('content') as string;
+  const resumeBullets = formData.get('resumeBullets') as string;
+  const estimatedHours = formData.get('estimatedHours') as string;
+  const isAvailable = formData.get('isAvailable') === 'true';
+
+  try {
+    // Get the guided_project content type ID
+    const [guidedProjectType] = await db
+      .select()
+      .from(contentTypes)
+      .where(eq(contentTypes.slug, 'guided_project'))
+      .limit(1);
+
+    // Create content item
+    const [contentItem] = await db
+      .insert(contentItems)
+      .values({
+        title,
+        description: description || null,
+        stageId: stageId ? parseInt(stageId) : null,
+        contentTypeId: guidedProjectType?.id || null,
+        difficulty: difficulty || null,
+        isAvailable,
+        order: 0,
+      })
+      .returning();
+
+    // Create project
+    await db
+      .insert(projects)
+      .values({
+        contentItemId: contentItem.id,
+        content: content || null,
+        resumeBullets: resumeBullets || null,
+        estimatedHours: estimatedHours ? parseInt(estimatedHours) : null,
+      });
+
+    revalidatePath('/admin/projects');
+    revalidatePath('/projects');
+    revalidatePath('/');
+
+    return { success: true, id: contentItem.id };
+  } catch (error) {
+    console.error('Error creating project:', error);
+    return { success: false, error: 'Failed to create project' };
+  }
+}
+
+export async function updateProject(id: number, formData: FormData) {
+  const title = formData.get('title') as string;
+  const description = formData.get('description') as string;
+  const stageId = formData.get('stageId') as string;
+  const difficulty = formData.get('difficulty') as string;
+  const content = formData.get('content') as string;
+  const resumeBullets = formData.get('resumeBullets') as string;
+  const estimatedHours = formData.get('estimatedHours') as string;
+  const isAvailable = formData.get('isAvailable') === 'true';
+
+  try {
+    // Update content item
+    await db
+      .update(contentItems)
+      .set({
+        title,
+        description: description || null,
+        stageId: stageId ? parseInt(stageId) : null,
+        difficulty: difficulty || null,
+        isAvailable,
+        updatedAt: new Date(),
+      })
+      .where(eq(contentItems.id, id));
+
+    // Update project
+    await db
+      .update(projects)
+      .set({
+        content: content || null,
+        resumeBullets: resumeBullets || null,
+        estimatedHours: estimatedHours ? parseInt(estimatedHours) : null,
+      })
+      .where(eq(projects.contentItemId, id));
+
+    revalidatePath('/admin/projects');
+    revalidatePath(`/admin/projects/${id}/edit`);
+    revalidatePath(`/projects/${id}`);
+    revalidatePath('/projects');
+    revalidatePath('/');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating project:', error);
+    return { success: false, error: 'Failed to update project' };
+  }
+}
+
+export async function deleteProject(id: number) {
+  try {
+    // Delete project first
+    await db.delete(projects).where(eq(projects.contentItemId, id));
+
+    // Delete content item
+    await db.delete(contentItems).where(eq(contentItems.id, id));
+
+    revalidatePath('/admin/projects');
+    revalidatePath('/projects');
+    revalidatePath('/');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    return { success: false, error: 'Failed to delete project' };
+  }
 }
