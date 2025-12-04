@@ -1,14 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
+import { TestCases } from "./TestCases";
+import type { TestCase } from "@/lib/markdown";
 
 interface CodeEditorProps {
   questionId: number;
   language?: string;
+  testCases?: TestCase[];
+  questionTitle?: string;
 }
 
-export function CodeEditor({ questionId, language = 'python' }: CodeEditorProps) {
-  const [code, setCode] = useState('');
+export function CodeEditor({
+  questionId,
+  language = "python",
+  testCases = [],
+  questionTitle,
+}: CodeEditorProps) {
+  const [code, setCode] = useState("");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -23,14 +32,16 @@ export function CodeEditor({ questionId, language = 'python' }: CodeEditorProps)
     // Also try to load from database
     const loadFromDatabase = async () => {
       try {
-        const response = await fetch(`/api/questions/solutions?questionId=${questionId}`);
+        const response = await fetch(
+          `/api/questions/solutions?questionId=${questionId}`,
+        );
         const data = await response.json();
         if (data.solution?.code) {
           setCode(data.solution.code);
           localStorage.setItem(`code_${questionId}`, data.solution.code);
         }
       } catch (error) {
-        console.error('Failed to load solution from database:', error);
+        console.error("Failed to load solution from database:", error);
       }
     };
 
@@ -60,9 +71,9 @@ export function CodeEditor({ questionId, language = 'python' }: CodeEditorProps)
 
     setSaving(true);
     try {
-      await fetch('/api/questions/solutions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/questions/solutions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           questionId,
           code,
@@ -73,7 +84,7 @@ export function CodeEditor({ questionId, language = 'python' }: CodeEditorProps)
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (error) {
-      console.error('Failed to save solution:', error);
+      console.error("Failed to save solution:", error);
     } finally {
       setSaving(false);
     }
@@ -84,17 +95,21 @@ export function CodeEditor({ questionId, language = 'python' }: CodeEditorProps)
   };
 
   const handleClear = () => {
-    if (window.confirm('Are you sure you want to clear your code? This cannot be undone.')) {
-      setCode('');
+    if (
+      window.confirm(
+        "Are you sure you want to clear your code? This cannot be undone.",
+      )
+    ) {
+      setCode("");
       localStorage.removeItem(`code_${questionId}`);
     }
   };
 
   const getPlaceholder = () => {
     switch (language) {
-      case 'python':
+      case "python":
         return `# Write your ${language} solution here...\n\ndef solution():\n    pass`;
-      case 'javascript':
+      case "javascript":
         return `// Write your ${language} solution here...\n\nfunction solution() {\n    \n}`;
       default:
         return `// Write your solution here...`;
@@ -105,8 +120,18 @@ export function CodeEditor({ questionId, language = 'python' }: CodeEditorProps)
     <div className="code-editor-section">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+            />
           </svg>
           Your Solution
         </h3>
@@ -152,15 +177,37 @@ export function CodeEditor({ questionId, language = 'python' }: CodeEditorProps)
             {saving ? (
               <>
                 <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
                 </svg>
                 Saving...
               </>
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                  />
                 </svg>
                 Save Solution
               </>
@@ -177,8 +224,18 @@ export function CodeEditor({ questionId, language = 'python' }: CodeEditorProps)
 
           {saved && (
             <span className="text-green-600 font-medium flex items-center gap-1 animate-fadeIn">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
               Saved!
             </span>
@@ -190,25 +247,39 @@ export function CodeEditor({ questionId, language = 'python' }: CodeEditorProps)
             <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
           )}
           <span className="flex items-center gap-1">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             Auto-saves every 30s
           </span>
         </div>
       </div>
 
-      <p className="text-sm text-gray-600 mt-3 flex items-center gap-2">
-        <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-        </svg>
-        Tip: Test your code locally in your IDE before marking as completed
-      </p>
+      {/* Test Cases Section */}
+      {testCases.length > 0 && (
+        <div className="mt-6">
+          <TestCases testCases={testCases} questionTitle={questionTitle} />
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-out;

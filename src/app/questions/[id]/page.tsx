@@ -10,9 +10,12 @@ import { AnswerSection } from "@/components/AnswerSection";
 import { CodeEditor } from "@/components/CodeEditor";
 import { QuestionActions } from "@/components/QuestionActions";
 import { LearningResources } from "@/components/LearningResources";
+import { HintsAndAnswerSection } from "@/components/HintsAndAnswerSection";
 import {
   extractAnswerWithoutResources,
   extractLearningResourcesFromAnswer,
+  parseHints,
+  extractTestCases,
 } from "@/lib/markdown";
 
 interface Props {
@@ -78,6 +81,15 @@ export default async function QuestionPage({ params }: Props) {
   const learningResourcesContent = extractLearningResourcesFromAnswer(
     item.question.answer || "",
   );
+
+  // Extract hints from answer content (look for ## Hints section)
+  const hintsMatch = (item.question.answer || "").match(
+    /## Hints\s*([\s\S]*?)(?=## Answer|## Learning Resources|$)/i,
+  );
+  const hints = hintsMatch ? parseHints(hintsMatch[1]) : [];
+
+  // Extract test cases from question content
+  const testCases = extractTestCases(item.question.content || "");
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -232,14 +244,22 @@ export default async function QuestionPage({ params }: Props) {
 
       {/* Code Editor */}
       <section className="mb-8">
-        <CodeEditor questionId={item.question.id} />
+        <CodeEditor
+          questionId={item.question.id}
+          testCases={testCases}
+          questionTitle={item.title}
+        />
       </section>
 
       <hr className="my-8 border-gray-200" />
 
-      {/* Answer Section (Hidden by Default) */}
+      {/* Hints and Answer Section */}
       <section className="mb-8">
-        <AnswerSection answer={answerContent} questionId={item.question.id} />
+        <HintsAndAnswerSection
+          hints={hints}
+          answer={answerContent}
+          questionId={item.question.id}
+        />
       </section>
 
       {/* Learning Resources */}

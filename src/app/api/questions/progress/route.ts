@@ -1,19 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
-import { questionProgress } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
-import { getOrCreateSessionId } from '@/lib/session';
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/db";
+import { questionProgress } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
+import { getOrCreateSessionId } from "@/lib/session";
 
 export async function GET(request: NextRequest) {
   try {
     const sessionId = await getOrCreateSessionId();
     const { searchParams } = new URL(request.url);
-    const questionId = searchParams.get('questionId');
+    const questionId = searchParams.get("questionId");
 
     if (!questionId) {
       return NextResponse.json(
-        { error: 'questionId is required' },
-        { status: 400 }
+        { error: "questionId is required" },
+        { status: 400 },
       );
     }
 
@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
       .where(
         and(
           eq(questionProgress.questionId, parseInt(questionId)),
-          eq(questionProgress.sessionId, sessionId)
-        )
+          eq(questionProgress.sessionId, sessionId),
+        ),
       )
       .limit(1);
 
@@ -33,10 +33,10 @@ export async function GET(request: NextRequest) {
       sessionId,
     });
   } catch (error) {
-    console.error('Error fetching progress:', error);
+    console.error("Error fetching progress:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch progress' },
-      { status: 500 }
+      { error: "Failed to fetch progress" },
+      { status: 500 },
     );
   }
 }
@@ -45,12 +45,19 @@ export async function POST(request: NextRequest) {
   try {
     const sessionId = await getOrCreateSessionId();
     const body = await request.json();
-    const { questionId, completed, timeSpent, notes, viewedAnswer } = body;
+    const {
+      questionId,
+      completed,
+      timeSpent,
+      notes,
+      viewedAnswer,
+      hintsRevealed,
+    } = body;
 
     if (!questionId) {
       return NextResponse.json(
-        { error: 'questionId is required' },
-        { status: 400 }
+        { error: "questionId is required" },
+        { status: 400 },
       );
     }
 
@@ -61,8 +68,8 @@ export async function POST(request: NextRequest) {
       .where(
         and(
           eq(questionProgress.questionId, questionId),
-          eq(questionProgress.sessionId, sessionId)
-        )
+          eq(questionProgress.sessionId, sessionId),
+        ),
       )
       .limit(1);
 
@@ -81,6 +88,7 @@ export async function POST(request: NextRequest) {
       if (timeSpent !== undefined) updateData.timeSpent = timeSpent;
       if (notes !== undefined) updateData.notes = notes;
       if (viewedAnswer !== undefined) updateData.viewedAnswer = viewedAnswer;
+      if (hintsRevealed !== undefined) updateData.hintsRevealed = hintsRevealed;
 
       await db
         .update(questionProgress)
@@ -97,16 +105,17 @@ export async function POST(request: NextRequest) {
         timeSpent: timeSpent || 0,
         notes: notes || null,
         viewedAnswer: viewedAnswer || false,
+        hintsRevealed: hintsRevealed || 0,
         completedAt: completed ? new Date() : null,
       });
 
       return NextResponse.json({ success: true, created: true });
     }
   } catch (error) {
-    console.error('Error saving progress:', error);
+    console.error("Error saving progress:", error);
     return NextResponse.json(
-      { error: 'Failed to save progress' },
-      { status: 500 }
+      { error: "Failed to save progress" },
+      { status: 500 },
     );
   }
 }

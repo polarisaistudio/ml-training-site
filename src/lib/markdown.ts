@@ -1,12 +1,25 @@
 /**
  * Markdown parsing utilities for question content
- * Extracts sections (Question, Answer, Learning Resources) from markdown
+ * Extracts sections (Question, Answer, Hints, Learning Resources) from markdown
  */
+
+export interface Hint {
+  level: number;
+  content: string;
+}
+
+export interface TestCase {
+  input: string;
+  output: string;
+  explanation?: string;
+}
 
 export interface ParsedMarkdownSections {
   question: string;
+  hints: Hint[];
   answer: string;
   learningResources: string;
+  testCases: TestCase[];
 }
 
 export interface LearningResource {
@@ -25,20 +38,35 @@ export interface ParsedLearningResources {
  */
 export function parseMarkdownSections(content: string): ParsedMarkdownSections {
   const sections: ParsedMarkdownSections = {
-    question: '',
-    answer: '',
-    learningResources: '',
+    question: "",
+    hints: [],
+    answer: "",
+    learningResources: "",
+    testCases: [],
   };
 
   if (!content) return sections;
 
   // Match sections using regex
-  const questionMatch = content.match(/## Question\s*([\s\S]*?)(?=## Answer|## Learning Resources|$)/i);
-  const answerMatch = content.match(/## Answer\s*([\s\S]*?)(?=## Learning Resources|$)/i);
+  const questionMatch = content.match(
+    /## Question\s*([\s\S]*?)(?=## Hints|## Answer|## Learning Resources|$)/i,
+  );
+  const hintsMatch = content.match(
+    /## Hints\s*([\s\S]*?)(?=## Answer|## Learning Resources|$)/i,
+  );
+  const answerMatch = content.match(
+    /## Answer\s*([\s\S]*?)(?=## Learning Resources|$)/i,
+  );
   const resourcesMatch = content.match(/## Learning Resources\s*([\s\S]*?)$/i);
 
   if (questionMatch) {
     sections.question = questionMatch[1].trim();
+    // Extract test cases from question section
+    sections.testCases = extractTestCases(questionMatch[1]);
+  }
+
+  if (hintsMatch) {
+    sections.hints = parseHints(hintsMatch[1]);
   }
 
   if (answerMatch) {
@@ -53,9 +81,71 @@ export function parseMarkdownSections(content: string): ParsedMarkdownSections {
 }
 
 /**
+ * Parse hints from the Hints section
+ */
+export function parseHints(hintsMarkdown: string): Hint[] {
+  const hints: Hint[] = [];
+
+  if (!hintsMarkdown) return hints;
+
+  // Match ### Hint N patterns
+  const hintRegex = /### Hint (\d+)\s*([\s\S]*?)(?=### Hint \d+|$)/gi;
+  let match;
+
+  while ((match = hintRegex.exec(hintsMarkdown)) !== null) {
+    const level = parseInt(match[1], 10);
+    const content = match[2].trim();
+    if (content) {
+      hints.push({ level, content });
+    }
+  }
+
+  // Sort by level
+  hints.sort((a, b) => a.level - b.level);
+
+  return hints;
+}
+
+/**
+ * Extract test cases from question content
+ * Looks for **Example N:** patterns followed by code blocks or formatted content
+ */
+export function extractTestCases(questionContent: string): TestCase[] {
+  const testCases: TestCase[] = [];
+
+  if (!questionContent) return testCases;
+
+  // Match **Example N:** followed by content (with or without code blocks)
+  const exampleRegex =
+    /\*\*Example\s*\d+:?\*\*\s*(?:```[^\n]*\n)?([\s\S]*?)(?:```)?(?=\*\*Example\s*\d+|(?:\*\*Constraints|\*\*Follow-up|\*\*Note|##|$))/gi;
+  let match;
+
+  while ((match = exampleRegex.exec(questionContent)) !== null) {
+    const content = match[1].trim();
+
+    // Parse Input, Output, Explanation from the content
+    const inputMatch = content.match(/Input:\s*(.+?)(?=\n|Output:|$)/i);
+    const outputMatch = content.match(/Output:\s*(.+?)(?=\n|Explanation:|$)/i);
+    const explanationMatch = content.match(/Explanation:\s*(.+?)$/im);
+
+    if (inputMatch && outputMatch) {
+      testCases.push({
+        input: inputMatch[1].trim(),
+        output: outputMatch[1].trim(),
+        explanation: explanationMatch ? explanationMatch[1].trim() : undefined,
+      });
+    }
+  }
+
+  return testCases;
+}
+
+/**
  * Parse learning resources section into structured data
  */
-export function parseLearningResources(resourcesMarkdown: string): ParsedLearningResources {
+export function parseLearningResources(
+  resourcesMarkdown: string,
+): ParsedLearningResources {
   const result: ParsedLearningResources = {
     videos: [],
     articles: [],
@@ -65,9 +155,15 @@ export function parseLearningResources(resourcesMarkdown: string): ParsedLearnin
   if (!resourcesMarkdown) return result;
 
   // Split by subsections
-  const videoMatch = resourcesMarkdown.match(/\*\*Video[s]?:\*\*\s*([\s\S]*?)(?=\*\*Article|$)/i);
-  const articleMatch = resourcesMarkdown.match(/\*\*Article[s]?:\*\*\s*([\s\S]*?)(?=\*\*Related|$)/i);
-  const relatedMatch = resourcesMarkdown.match(/\*\*Related Problems?:\*\*\s*([\s\S]*?)$/i);
+  const videoMatch = resourcesMarkdown.match(
+    /\*\*Video[s]?:\*\*\s*([\s\S]*?)(?=\*\*Article|$)/i,
+  );
+  const articleMatch = resourcesMarkdown.match(
+    /\*\*Article[s]?:\*\*\s*([\s\S]*?)(?=\*\*Related|$)/i,
+  );
+  const relatedMatch = resourcesMarkdown.match(
+    /\*\*Related Problems?:\*\*\s*([\s\S]*?)$/i,
+  );
 
   // Parse links from markdown format: - [Title](URL)
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
@@ -89,10 +185,12 @@ export function parseLearningResources(resourcesMarkdown: string): ParsedLearnin
 
   if (relatedMatch) {
     // Parse related problems - they may or may not have links
-    const lines = relatedMatch[1].split('\n').filter(line => line.trim().startsWith('-'));
+    const lines = relatedMatch[1]
+      .split("\n")
+      .filter((line) => line.trim().startsWith("-"));
     for (const line of lines) {
       // Remove the leading "- " and trim
-      const problem = line.replace(/^-\s*/, '').trim();
+      const problem = line.replace(/^-\s*/, "").trim();
       if (problem) {
         result.relatedProblems.push(problem);
       }
@@ -107,10 +205,10 @@ export function parseLearningResources(resourcesMarkdown: string): ParsedLearnin
  * This is used when answer is stored separately but includes Learning Resources
  */
 export function extractAnswerWithoutResources(answer: string): string {
-  if (!answer) return '';
+  if (!answer) return "";
 
   // Remove Learning Resources section if present
-  const resourcesStart = answer.indexOf('## Learning Resources');
+  const resourcesStart = answer.indexOf("## Learning Resources");
   if (resourcesStart !== -1) {
     return answer.substring(0, resourcesStart).trim();
   }
@@ -122,8 +220,8 @@ export function extractAnswerWithoutResources(answer: string): string {
  * Extract Learning Resources from answer field
  */
 export function extractLearningResourcesFromAnswer(answer: string): string {
-  if (!answer) return '';
+  if (!answer) return "";
 
   const resourcesMatch = answer.match(/## Learning Resources\s*([\s\S]*?)$/i);
-  return resourcesMatch ? resourcesMatch[1].trim() : '';
+  return resourcesMatch ? resourcesMatch[1].trim() : "";
 }

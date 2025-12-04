@@ -107,6 +107,7 @@ export const questionProgress = pgTable("question_progress", {
   timeSpent: integer("time_spent").default(0).notNull(), // seconds
   notes: text("notes"),
   viewedAnswer: boolean("viewed_answer").default(false).notNull(),
+  hintsRevealed: integer("hints_revealed").default(0).notNull(), // 0, 1, 2, or 3
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
