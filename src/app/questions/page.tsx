@@ -8,17 +8,21 @@ import {
   questionProgress,
   userSolutions,
 } from "@/db";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { EmptyState } from "@/components/EmptyState";
 import { QuestionFilters } from "@/components/QuestionFilters";
 import { RecommendedNext } from "@/components/RecommendedNext";
 import { QuestionListItem } from "@/components/QuestionListItem";
+import { RealQuestionCard } from "@/components/RealQuestionCard";
+import { QuestionTabs } from "@/components/QuestionTabs";
 import { getOrCreateSessionId } from "@/lib/session";
+import type { RealInterviewDetails } from "@/db/schema";
 
 interface SearchParams {
   difficulty?: string;
   status?: string;
   tag?: string;
+  tab?: string;
 }
 
 async function getAllQuestionsWithProgress(sessionId: string) {
@@ -39,6 +43,8 @@ async function getAllQuestionsWithProgress(sessionId: string) {
         sourceCompany: questions.sourceCompany,
         isVerified: questions.isVerified,
         tags: questions.tags,
+        sourceType: questions.sourceType,
+        realInterviewDetails: questions.realInterviewDetails,
       },
     })
     .from(contentItems)
@@ -84,6 +90,9 @@ async function getAllQuestionsWithProgress(sessionId: string) {
         !progress?.completed
       ),
       hintsUsed: progress?.hintsRevealed || 0,
+      sourceType: item.question.sourceType,
+      realInterviewDetails: item.question
+        .realInterviewDetails as RealInterviewDetails | null,
     };
   });
 }
@@ -132,56 +141,152 @@ async function QuestionsContent({
 }) {
   const sessionId = await getOrCreateSessionId();
   const allQuestions = await getAllQuestionsWithProgress(sessionId);
-  const filteredQuestions = filterQuestions(allQuestions, searchParams);
-  const availableTags = extractAllTags(allQuestions);
 
-  const completedCount = allQuestions.filter((q) => q.completed).length;
+  // Separate by source type
+  const realQuestions = allQuestions.filter(
+    (q) => q.sourceType === "real-interview",
+  );
+  const practiceQuestions = allQuestions.filter(
+    (q) => q.sourceType === "generated",
+  );
+
+  // Determine active tab
+  const activeTab = searchParams.tab === "practice" ? "practice" : "real";
+  const displayQuestions =
+    activeTab === "real" ? realQuestions : practiceQuestions;
+
+  const filteredQuestions = filterQuestions(displayQuestions, searchParams);
+  const availableTags = extractAllTags(displayQuestions);
+
+  const completedCount = displayQuestions.filter((q) => q.completed).length;
   const hasActiveFilters =
     searchParams.difficulty || searchParams.status || searchParams.tag;
 
   return (
     <>
-      {/* Recommended Next (only show when no filters are active) */}
-      {!hasActiveFilters && <RecommendedNext questions={allQuestions} />}
+      {/* Tabs */}
+      <QuestionTabs
+        activeTab={activeTab}
+        realCount={realQuestions.length}
+        practiceCount={practiceQuestions.length}
+      />
 
-      {/* Filters */}
-      <Suspense
-        fallback={<div className="h-32 bg-gray-100 rounded-xl animate-pulse" />}
-      >
-        <QuestionFilters
-          availableTags={availableTags}
-          totalCount={allQuestions.length}
-          completedCount={completedCount}
-        />
-      </Suspense>
+      {activeTab === "real" ? (
+        // Real Interview Questions Tab
+        <div>
+          {/* Priority Banner */}
+          {realQuestions.length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-900 font-semibold mb-1">
+                Priority: Practice Real Interview Questions First
+              </p>
+              <p className="text-red-700 text-sm">
+                These questions came from actual interviews. They&apos;re the
+                most valuable for preparation.
+              </p>
+            </div>
+          )}
 
-      {/* Questions List */}
-      {filteredQuestions.length === 0 ? (
-        <EmptyState
-          title={
-            hasActiveFilters
-              ? "No questions match your filters"
-              : "No questions available yet"
-          }
-          description={
-            hasActiveFilters
-              ? "Try adjusting your filters to see more questions."
-              : "Questions are being added. Check back soon!"
-          }
-        />
-      ) : (
-        <div className="space-y-3">
-          {filteredQuestions.map((question) => (
-            <QuestionListItem key={question.id} question={question} />
-          ))}
+          {realQuestions.length === 0 ? (
+            <EmptyState
+              title="No real interview questions yet"
+              description="After each interview, add the questions you were asked to build your real question bank."
+            />
+          ) : (
+            <>
+              {/* Filters for real questions */}
+              {realQuestions.length > 3 && (
+                <Suspense
+                  fallback={
+                    <div className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+                  }
+                >
+                  <QuestionFilters
+                    availableTags={availableTags}
+                    totalCount={realQuestions.length}
+                    completedCount={completedCount}
+                  />
+                </Suspense>
+              )}
+
+              {/* Real Questions List */}
+              {filteredQuestions.length === 0 ? (
+                <EmptyState
+                  title="No questions match your filters"
+                  description="Try adjusting your filters to see more questions."
+                />
+              ) : (
+                <div className="space-y-4">
+                  {filteredQuestions.map((question) => (
+                    <RealQuestionCard key={question.id} question={question} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
-      )}
+      ) : (
+        // Practice Questions Tab
+        <div>
+          {/* Practice Info Banner */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-blue-900 font-semibold mb-1">
+              Practice Questions
+            </p>
+            <p className="text-blue-700 text-sm">
+              AI-generated questions covering common interview patterns. Use
+              these to build foundational skills.
+            </p>
+          </div>
 
-      {/* Results count */}
-      {hasActiveFilters && filteredQuestions.length > 0 && (
-        <p className="text-sm text-gray-500 mt-4 text-center">
-          Showing {filteredQuestions.length} of {allQuestions.length} questions
-        </p>
+          {/* Recommended Next (only show when no filters are active) */}
+          {!hasActiveFilters && practiceQuestions.length > 0 && (
+            <RecommendedNext questions={practiceQuestions} />
+          )}
+
+          {/* Filters */}
+          <Suspense
+            fallback={
+              <div className="h-32 bg-gray-100 rounded-xl animate-pulse" />
+            }
+          >
+            <QuestionFilters
+              availableTags={availableTags}
+              totalCount={practiceQuestions.length}
+              completedCount={completedCount}
+            />
+          </Suspense>
+
+          {/* Questions List */}
+          {filteredQuestions.length === 0 ? (
+            <EmptyState
+              title={
+                hasActiveFilters
+                  ? "No questions match your filters"
+                  : "No practice questions available yet"
+              }
+              description={
+                hasActiveFilters
+                  ? "Try adjusting your filters to see more questions."
+                  : "Questions are being added. Check back soon!"
+              }
+            />
+          ) : (
+            <div className="space-y-3">
+              {filteredQuestions.map((question) => (
+                <QuestionListItem key={question.id} question={question} />
+              ))}
+            </div>
+          )}
+
+          {/* Results count */}
+          {hasActiveFilters && filteredQuestions.length > 0 && (
+            <p className="text-sm text-gray-500 mt-4 text-center">
+              Showing {filteredQuestions.length} of {practiceQuestions.length}{" "}
+              questions
+            </p>
+          )}
+        </div>
       )}
     </>
   );
@@ -208,6 +313,7 @@ export default async function QuestionsPage({
       <Suspense
         fallback={
           <div className="space-y-4">
+            <div className="h-14 bg-gray-100 rounded-xl animate-pulse" />
             <div className="h-24 bg-gray-100 rounded-xl animate-pulse" />
             <div className="h-32 bg-gray-100 rounded-xl animate-pulse" />
             <div className="space-y-3">

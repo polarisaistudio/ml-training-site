@@ -6,17 +6,18 @@ import { Badge } from "@/components/ui/Badge";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { getDifficultyColor, formatDate } from "@/lib/utils";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
-import { AnswerSection } from "@/components/AnswerSection";
 import { CodeEditor } from "@/components/CodeEditor";
 import { QuestionActions } from "@/components/QuestionActions";
 import { LearningResources } from "@/components/LearningResources";
 import { HintsAndAnswerSection } from "@/components/HintsAndAnswerSection";
+import { RealInterviewBanner } from "@/components/RealInterviewBanner";
 import {
   extractAnswerWithoutResources,
   extractLearningResourcesFromAnswer,
   parseHints,
   extractTestCases,
 } from "@/lib/markdown";
+import type { RealInterviewDetails } from "@/db/schema";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -46,6 +47,8 @@ async function getQuestion(id: number) {
         sourceCompany: questions.sourceCompany,
         isVerified: questions.isVerified,
         tags: questions.tags,
+        sourceType: questions.sourceType,
+        realInterviewDetails: questions.realInterviewDetails,
       },
     })
     .from(contentItems)
@@ -73,6 +76,9 @@ export default async function QuestionPage({ params }: Props) {
   }
 
   const tags = item.question.tags ? JSON.parse(item.question.tags) : [];
+  const isRealInterview = item.question.sourceType === "real-interview";
+  const realInterviewDetails = item.question
+    .realInterviewDetails as RealInterviewDetails | null;
 
   // Extract answer and learning resources separately
   const answerContent = extractAnswerWithoutResources(
@@ -91,12 +97,18 @@ export default async function QuestionPage({ params }: Props) {
   // Extract test cases from question content
   const testCases = extractTestCases(item.question.content || "");
 
+  // Determine back link based on question type
+  const backLink = isRealInterview ? "/questions" : "/questions?tab=practice";
+  const backLinkText = isRealInterview
+    ? "Real Interview Questions"
+    : "Practice Questions";
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Back Navigation */}
       <div className="mb-6">
         <Link
-          href="/questions"
+          href={backLink}
           className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
         >
           <svg
@@ -112,13 +124,28 @@ export default async function QuestionPage({ params }: Props) {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          Back to Questions
+          Back to {backLinkText}
         </Link>
       </div>
+
+      {/* Real Interview Banner */}
+      {isRealInterview && realInterviewDetails && (
+        <RealInterviewBanner details={realInterviewDetails} />
+      )}
 
       {/* Header */}
       <header className="mb-8">
         <div className="flex flex-wrap items-center gap-2 mb-4">
+          {/* Source Type Badge */}
+          {isRealInterview ? (
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-red-600 text-white">
+              🎯 Real Interview
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-700">
+              📚 Practice
+            </span>
+          )}
           {item.difficulty && (
             <span
               className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${getDifficultyColor(item.difficulty)}`}
@@ -278,7 +305,7 @@ export default async function QuestionPage({ params }: Props) {
       {/* Bottom Navigation */}
       <div className="mt-12 pt-6 border-t border-gray-200">
         <Link
-          href="/questions"
+          href={backLink}
           className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
         >
           <svg
@@ -294,7 +321,7 @@ export default async function QuestionPage({ params }: Props) {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          Back to Questions
+          Back to {backLinkText}
         </Link>
       </div>
     </div>

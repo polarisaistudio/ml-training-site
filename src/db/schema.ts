@@ -7,6 +7,7 @@ import {
   boolean,
   varchar,
   date,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -45,6 +46,19 @@ export const contentItems = pgTable("content_items", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Real interview details type
+export type RealInterviewDetails = {
+  company?: string;
+  position?: string;
+  interviewDate?: string;
+  result?: "passed" | "failed" | "pending";
+  interviewerFocus?: string;
+  hintsGiven?: string;
+  followUpQuestions?: string[];
+  myPerformance?: string;
+  notes?: string;
+};
+
 // Questions - specific to question content
 export const questions = pgTable("questions", {
   id: serial("id").primaryKey(),
@@ -56,6 +70,16 @@ export const questions = pgTable("questions", {
   sourceCompany: varchar("source_company", { length: 255 }),
   isVerified: boolean("is_verified").default(false).notNull(), // Verified from real interview
   tags: text("tags"), // JSON array of tags stored as text
+  // New fields for real interview tracking
+  sourceType: varchar("source_type", { length: 20 })
+    .default("generated")
+    .notNull(), // 'generated' or 'real-interview'
+  interviewLogId: integer("interview_log_id").references(
+    () => interviewLogs.id,
+  ),
+  realInterviewDetails: jsonb(
+    "real_interview_details",
+  ).$type<RealInterviewDetails>(),
 });
 
 // Projects - specific to project content

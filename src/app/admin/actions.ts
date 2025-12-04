@@ -1,22 +1,35 @@
-'use server';
+"use server";
 
-import { revalidatePath } from 'next/cache';
-import { db, contentItems, questions, projects, interviewLogs, questionSources, stages, contentTypes } from '@/db';
-import { eq } from 'drizzle-orm';
+import { revalidatePath } from "next/cache";
+import {
+  db,
+  contentItems,
+  questions,
+  projects,
+  interviewLogs,
+  questionSources,
+  stages,
+  contentTypes,
+} from "@/db";
+import { eq } from "drizzle-orm";
 
 export async function createQuestion(formData: FormData) {
-  const title = formData.get('title') as string;
-  const description = formData.get('description') as string;
-  const stageId = formData.get('stageId') as string;
-  const contentTypeId = formData.get('contentTypeId') as string;
-  const difficulty = formData.get('difficulty') as string;
-  const content = formData.get('content') as string;
-  const answer = formData.get('answer') as string;
-  const sourceCompany = formData.get('sourceCompany') as string;
-  const isVerified = formData.get('isVerified') === 'true';
-  const isAvailable = formData.get('isAvailable') === 'true';
-  const tags = formData.get('tags') as string;
-  const interviewLogId = formData.get('interviewLogId') as string;
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const stageId = formData.get("stageId") as string;
+  const contentTypeId = formData.get("contentTypeId") as string;
+  const difficulty = formData.get("difficulty") as string;
+  const content = formData.get("content") as string;
+  const answer = formData.get("answer") as string;
+  const sourceCompany = formData.get("sourceCompany") as string;
+  const isVerified = formData.get("isVerified") === "true";
+  const isAvailable = formData.get("isAvailable") === "true";
+  const tags = formData.get("tags") as string;
+  const interviewLogId = formData.get("interviewLogId") as string;
+  const sourceType = (formData.get("sourceType") as string) || "generated";
+  const realInterviewDetailsJson = formData.get(
+    "realInterviewDetails",
+  ) as string;
 
   try {
     // Create content item
@@ -33,6 +46,16 @@ export async function createQuestion(formData: FormData) {
       })
       .returning();
 
+    // Parse real interview details if provided
+    let realInterviewDetails = null;
+    if (realInterviewDetailsJson) {
+      try {
+        realInterviewDetails = JSON.parse(realInterviewDetailsJson);
+      } catch {
+        console.error("Failed to parse realInterviewDetails");
+      }
+    }
+
     // Create question
     const [question] = await db
       .insert(questions)
@@ -42,11 +65,16 @@ export async function createQuestion(formData: FormData) {
         answer: answer || null,
         sourceCompany: sourceCompany || null,
         isVerified,
-        tags: tags ? JSON.stringify(tags.split(',').map((t: string) => t.trim())) : null,
+        tags: tags
+          ? JSON.stringify(tags.split(",").map((t: string) => t.trim()))
+          : null,
+        sourceType: sourceType as "generated" | "real-interview",
+        interviewLogId: interviewLogId ? parseInt(interviewLogId) : null,
+        realInterviewDetails,
       })
       .returning();
 
-    // Link to interview log if provided
+    // Link to interview log if provided (legacy support)
     if (interviewLogId) {
       await db.insert(questionSources).values({
         questionId: question.id,
@@ -54,29 +82,30 @@ export async function createQuestion(formData: FormData) {
       });
     }
 
-    revalidatePath('/admin/questions');
-    revalidatePath('/questions');
-    revalidatePath('/');
+    revalidatePath("/admin/questions");
+    revalidatePath("/admin/real-questions");
+    revalidatePath("/questions");
+    revalidatePath("/");
 
     return { success: true, id: contentItem.id };
   } catch (error) {
-    console.error('Error creating question:', error);
-    return { success: false, error: 'Failed to create question' };
+    console.error("Error creating question:", error);
+    return { success: false, error: "Failed to create question" };
   }
 }
 
 export async function updateQuestion(id: number, formData: FormData) {
-  const title = formData.get('title') as string;
-  const description = formData.get('description') as string;
-  const stageId = formData.get('stageId') as string;
-  const contentTypeId = formData.get('contentTypeId') as string;
-  const difficulty = formData.get('difficulty') as string;
-  const content = formData.get('content') as string;
-  const answer = formData.get('answer') as string;
-  const sourceCompany = formData.get('sourceCompany') as string;
-  const isVerified = formData.get('isVerified') === 'true';
-  const isAvailable = formData.get('isAvailable') === 'true';
-  const tags = formData.get('tags') as string;
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const stageId = formData.get("stageId") as string;
+  const contentTypeId = formData.get("contentTypeId") as string;
+  const difficulty = formData.get("difficulty") as string;
+  const content = formData.get("content") as string;
+  const answer = formData.get("answer") as string;
+  const sourceCompany = formData.get("sourceCompany") as string;
+  const isVerified = formData.get("isVerified") === "true";
+  const isAvailable = formData.get("isAvailable") === "true";
+  const tags = formData.get("tags") as string;
 
   try {
     // Update content item
@@ -101,29 +130,37 @@ export async function updateQuestion(id: number, formData: FormData) {
         answer: answer || null,
         sourceCompany: sourceCompany || null,
         isVerified,
-        tags: tags ? JSON.stringify(tags.split(',').map((t: string) => t.trim())) : null,
+        tags: tags
+          ? JSON.stringify(tags.split(",").map((t: string) => t.trim()))
+          : null,
       })
       .where(eq(questions.contentItemId, id));
 
-    revalidatePath('/admin/questions');
+    revalidatePath("/admin/questions");
     revalidatePath(`/admin/questions/${id}/edit`);
     revalidatePath(`/questions/${id}`);
-    revalidatePath('/questions');
-    revalidatePath('/');
+    revalidatePath("/questions");
+    revalidatePath("/");
 
     return { success: true };
   } catch (error) {
-    console.error('Error updating question:', error);
-    return { success: false, error: 'Failed to update question' };
+    console.error("Error updating question:", error);
+    return { success: false, error: "Failed to update question" };
   }
 }
 
 export async function deleteQuestion(id: number) {
   try {
     // Delete question sources first
-    const question = await db.select().from(questions).where(eq(questions.contentItemId, id)).limit(1);
+    const question = await db
+      .select()
+      .from(questions)
+      .where(eq(questions.contentItemId, id))
+      .limit(1);
     if (question[0]) {
-      await db.delete(questionSources).where(eq(questionSources.questionId, question[0].id));
+      await db
+        .delete(questionSources)
+        .where(eq(questionSources.questionId, question[0].id));
     }
 
     // Delete question
@@ -132,26 +169,26 @@ export async function deleteQuestion(id: number) {
     // Delete content item
     await db.delete(contentItems).where(eq(contentItems.id, id));
 
-    revalidatePath('/admin/questions');
-    revalidatePath('/questions');
-    revalidatePath('/');
+    revalidatePath("/admin/questions");
+    revalidatePath("/questions");
+    revalidatePath("/");
 
     return { success: true };
   } catch (error) {
-    console.error('Error deleting question:', error);
-    return { success: false, error: 'Failed to delete question' };
+    console.error("Error deleting question:", error);
+    return { success: false, error: "Failed to delete question" };
   }
 }
 
 export async function createInterviewLog(formData: FormData) {
-  const company = formData.get('company') as string;
-  const position = formData.get('position') as string;
-  const interviewDate = formData.get('interviewDate') as string;
-  const roundType = formData.get('roundType') as string;
-  const questionsAsked = formData.get('questionsAsked') as string;
-  const difficulty = formData.get('difficulty') as string;
-  const result = formData.get('result') as string;
-  const notes = formData.get('notes') as string;
+  const company = formData.get("company") as string;
+  const position = formData.get("position") as string;
+  const interviewDate = formData.get("interviewDate") as string;
+  const roundType = formData.get("roundType") as string;
+  const questionsAsked = formData.get("questionsAsked") as string;
+  const difficulty = formData.get("difficulty") as string;
+  const result = formData.get("result") as string;
+  const notes = formData.get("notes") as string;
 
   try {
     const [log] = await db
@@ -168,24 +205,24 @@ export async function createInterviewLog(formData: FormData) {
       })
       .returning();
 
-    revalidatePath('/admin/interview-logs');
+    revalidatePath("/admin/interview-logs");
 
     return { success: true, id: log.id };
   } catch (error) {
-    console.error('Error creating interview log:', error);
-    return { success: false, error: 'Failed to create interview log' };
+    console.error("Error creating interview log:", error);
+    return { success: false, error: "Failed to create interview log" };
   }
 }
 
 export async function updateInterviewLog(id: number, formData: FormData) {
-  const company = formData.get('company') as string;
-  const position = formData.get('position') as string;
-  const interviewDate = formData.get('interviewDate') as string;
-  const roundType = formData.get('roundType') as string;
-  const questionsAsked = formData.get('questionsAsked') as string;
-  const difficulty = formData.get('difficulty') as string;
-  const result = formData.get('result') as string;
-  const notes = formData.get('notes') as string;
+  const company = formData.get("company") as string;
+  const position = formData.get("position") as string;
+  const interviewDate = formData.get("interviewDate") as string;
+  const roundType = formData.get("roundType") as string;
+  const questionsAsked = formData.get("questionsAsked") as string;
+  const difficulty = formData.get("difficulty") as string;
+  const result = formData.get("result") as string;
+  const notes = formData.get("notes") as string;
 
   try {
     await db
@@ -203,30 +240,32 @@ export async function updateInterviewLog(id: number, formData: FormData) {
       })
       .where(eq(interviewLogs.id, id));
 
-    revalidatePath('/admin/interview-logs');
+    revalidatePath("/admin/interview-logs");
     revalidatePath(`/admin/interview-logs/${id}/edit`);
 
     return { success: true };
   } catch (error) {
-    console.error('Error updating interview log:', error);
-    return { success: false, error: 'Failed to update interview log' };
+    console.error("Error updating interview log:", error);
+    return { success: false, error: "Failed to update interview log" };
   }
 }
 
 export async function deleteInterviewLog(id: number) {
   try {
     // Delete related question sources first
-    await db.delete(questionSources).where(eq(questionSources.interviewLogId, id));
+    await db
+      .delete(questionSources)
+      .where(eq(questionSources.interviewLogId, id));
 
     // Delete interview log
     await db.delete(interviewLogs).where(eq(interviewLogs.id, id));
 
-    revalidatePath('/admin/interview-logs');
+    revalidatePath("/admin/interview-logs");
 
     return { success: true };
   } catch (error) {
-    console.error('Error deleting interview log:', error);
-    return { success: false, error: 'Failed to delete interview log' };
+    console.error("Error deleting interview log:", error);
+    return { success: false, error: "Failed to delete interview log" };
   }
 }
 
@@ -241,21 +280,21 @@ export async function getStagesAndContentTypes() {
 
 // Project CRUD actions
 export async function createProject(formData: FormData) {
-  const title = formData.get('title') as string;
-  const description = formData.get('description') as string;
-  const stageId = formData.get('stageId') as string;
-  const difficulty = formData.get('difficulty') as string;
-  const content = formData.get('content') as string;
-  const resumeBullets = formData.get('resumeBullets') as string;
-  const estimatedHours = formData.get('estimatedHours') as string;
-  const isAvailable = formData.get('isAvailable') === 'true';
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const stageId = formData.get("stageId") as string;
+  const difficulty = formData.get("difficulty") as string;
+  const content = formData.get("content") as string;
+  const resumeBullets = formData.get("resumeBullets") as string;
+  const estimatedHours = formData.get("estimatedHours") as string;
+  const isAvailable = formData.get("isAvailable") === "true";
 
   try {
     // Get the guided_project content type ID
     const [guidedProjectType] = await db
       .select()
       .from(contentTypes)
-      .where(eq(contentTypes.slug, 'guided_project'))
+      .where(eq(contentTypes.slug, "guided_project"))
       .limit(1);
 
     // Create content item
@@ -273,35 +312,33 @@ export async function createProject(formData: FormData) {
       .returning();
 
     // Create project
-    await db
-      .insert(projects)
-      .values({
-        contentItemId: contentItem.id,
-        content: content || null,
-        resumeBullets: resumeBullets || null,
-        estimatedHours: estimatedHours ? parseInt(estimatedHours) : null,
-      });
+    await db.insert(projects).values({
+      contentItemId: contentItem.id,
+      content: content || null,
+      resumeBullets: resumeBullets || null,
+      estimatedHours: estimatedHours ? parseInt(estimatedHours) : null,
+    });
 
-    revalidatePath('/admin/projects');
-    revalidatePath('/projects');
-    revalidatePath('/');
+    revalidatePath("/admin/projects");
+    revalidatePath("/projects");
+    revalidatePath("/");
 
     return { success: true, id: contentItem.id };
   } catch (error) {
-    console.error('Error creating project:', error);
-    return { success: false, error: 'Failed to create project' };
+    console.error("Error creating project:", error);
+    return { success: false, error: "Failed to create project" };
   }
 }
 
 export async function updateProject(id: number, formData: FormData) {
-  const title = formData.get('title') as string;
-  const description = formData.get('description') as string;
-  const stageId = formData.get('stageId') as string;
-  const difficulty = formData.get('difficulty') as string;
-  const content = formData.get('content') as string;
-  const resumeBullets = formData.get('resumeBullets') as string;
-  const estimatedHours = formData.get('estimatedHours') as string;
-  const isAvailable = formData.get('isAvailable') === 'true';
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const stageId = formData.get("stageId") as string;
+  const difficulty = formData.get("difficulty") as string;
+  const content = formData.get("content") as string;
+  const resumeBullets = formData.get("resumeBullets") as string;
+  const estimatedHours = formData.get("estimatedHours") as string;
+  const isAvailable = formData.get("isAvailable") === "true";
 
   try {
     // Update content item
@@ -327,16 +364,16 @@ export async function updateProject(id: number, formData: FormData) {
       })
       .where(eq(projects.contentItemId, id));
 
-    revalidatePath('/admin/projects');
+    revalidatePath("/admin/projects");
     revalidatePath(`/admin/projects/${id}/edit`);
     revalidatePath(`/projects/${id}`);
-    revalidatePath('/projects');
-    revalidatePath('/');
+    revalidatePath("/projects");
+    revalidatePath("/");
 
     return { success: true };
   } catch (error) {
-    console.error('Error updating project:', error);
-    return { success: false, error: 'Failed to update project' };
+    console.error("Error updating project:", error);
+    return { success: false, error: "Failed to update project" };
   }
 }
 
@@ -348,13 +385,13 @@ export async function deleteProject(id: number) {
     // Delete content item
     await db.delete(contentItems).where(eq(contentItems.id, id));
 
-    revalidatePath('/admin/projects');
-    revalidatePath('/projects');
-    revalidatePath('/');
+    revalidatePath("/admin/projects");
+    revalidatePath("/projects");
+    revalidatePath("/");
 
     return { success: true };
   } catch (error) {
-    console.error('Error deleting project:', error);
-    return { success: false, error: 'Failed to delete project' };
+    console.error("Error deleting project:", error);
+    return { success: false, error: "Failed to delete project" };
   }
 }
