@@ -15,6 +15,7 @@ import { RecommendedNext } from "@/components/RecommendedNext";
 import { QuestionListItem } from "@/components/QuestionListItem";
 import { RealQuestionCard } from "@/components/RealQuestionCard";
 import { QuestionTabs } from "@/components/QuestionTabs";
+import { ContentTypeTabs } from "@/components/ContentTypeTabs";
 import { getOrCreateSessionId } from "@/lib/session";
 import type { RealInterviewDetails } from "@/db/schema";
 
@@ -23,6 +24,7 @@ interface SearchParams {
   status?: string;
   tag?: string;
   tab?: string;
+  type?: string; // content type filter: 'all', 'ml_concept', 'ml_coding', 'algorithm_problem'
 }
 
 async function getAllQuestionsWithProgress(sessionId: string) {
@@ -33,9 +35,11 @@ async function getAllQuestionsWithProgress(sessionId: string) {
       difficulty: contentItems.difficulty,
       isAvailable: contentItems.isAvailable,
       contentType: {
+        slug: contentTypes.slug,
         name: contentTypes.name,
       },
       stage: {
+        slug: stages.slug,
         name: stages.name,
       },
       question: {
@@ -93,6 +97,9 @@ async function getAllQuestionsWithProgress(sessionId: string) {
       sourceType: item.question.sourceType,
       realInterviewDetails: item.question
         .realInterviewDetails as RealInterviewDetails | null,
+      contentTypeSlug: item.contentType?.slug || null,
+      contentTypeName: item.contentType?.name || null,
+      stageSlug: item.stage?.slug || null,
     };
   });
 }
@@ -120,6 +127,11 @@ function filterQuestions(
       if (!q.tags.includes(filters.tag)) return false;
     }
 
+    // Content type filter
+    if (filters.type && filters.type !== "all") {
+      if (q.contentTypeSlug !== filters.type) return false;
+    }
+
     return true;
   });
 }
@@ -132,6 +144,30 @@ function extractAllTags(
     q.tags.forEach((tag: string) => tagSet.add(tag));
   });
   return Array.from(tagSet).sort();
+}
+
+function extractContentTypes(
+  questions: Awaited<ReturnType<typeof getAllQuestionsWithProgress>>,
+) {
+  const typeMap = new Map<
+    string,
+    { slug: string; name: string; count: number }
+  >();
+  questions.forEach((q) => {
+    if (q.contentTypeSlug && q.contentTypeName) {
+      const existing = typeMap.get(q.contentTypeSlug);
+      if (existing) {
+        existing.count++;
+      } else {
+        typeMap.set(q.contentTypeSlug, {
+          slug: q.contentTypeSlug,
+          name: q.contentTypeName,
+          count: 1,
+        });
+      }
+    }
+  });
+  return Array.from(typeMap.values());
 }
 
 async function QuestionsContent({
@@ -157,10 +193,20 @@ async function QuestionsContent({
 
   const filteredQuestions = filterQuestions(displayQuestions, searchParams);
   const availableTags = extractAllTags(displayQuestions);
+  const contentTypes = extractContentTypes(displayQuestions);
+  const activeType = searchParams.type || "all";
 
-  const completedCount = displayQuestions.filter((q) => q.completed).length;
+  // Calculate completed count based on filtered type
+  const questionsForCount =
+    searchParams.type && searchParams.type !== "all"
+      ? displayQuestions.filter((q) => q.contentTypeSlug === searchParams.type)
+      : displayQuestions;
+  const completedCount = questionsForCount.filter((q) => q.completed).length;
   const hasActiveFilters =
-    searchParams.difficulty || searchParams.status || searchParams.tag;
+    searchParams.difficulty ||
+    searchParams.status ||
+    searchParams.tag ||
+    searchParams.type;
 
   return (
     <>
@@ -239,6 +285,20 @@ async function QuestionsContent({
             </p>
           </div>
 
+          {/* Content Type Tabs - show when there are multiple types */}
+          {contentTypes.length > 1 && (
+            <Suspense
+              fallback={
+                <div className="h-12 bg-gray-100 rounded-lg animate-pulse mb-4" />
+              }
+            >
+              <ContentTypeTabs
+                contentTypes={contentTypes}
+                activeType={activeType}
+              />
+            </Suspense>
+          )}
+
           {/* Recommended Next (only show when no filters are active) */}
           {!hasActiveFilters && practiceQuestions.length > 0 && (
             <RecommendedNext questions={practiceQuestions} />
@@ -252,7 +312,7 @@ async function QuestionsContent({
           >
             <QuestionFilters
               availableTags={availableTags}
-              totalCount={practiceQuestions.length}
+              totalCount={questionsForCount.length}
               completedCount={completedCount}
             />
           </Suspense>
@@ -282,7 +342,7 @@ async function QuestionsContent({
           {/* Results count */}
           {hasActiveFilters && filteredQuestions.length > 0 && (
             <p className="text-sm text-gray-500 mt-4 text-center">
-              Showing {filteredQuestions.length} of {practiceQuestions.length}{" "}
+              Showing {filteredQuestions.length} of {questionsForCount.length}{" "}
               questions
             </p>
           )}
