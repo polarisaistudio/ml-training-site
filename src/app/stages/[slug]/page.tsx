@@ -225,7 +225,7 @@ export default async function StagePage({ params }: Props) {
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-2xl">📖</span>
                   <h2 className="text-xl font-bold text-gray-900">
-                    ML Concepts (八股文)
+                    ML Concepts
                   </h2>
                   <Badge variant="info">{mlConcepts.length}</Badge>
                 </div>
