@@ -1,16 +1,102 @@
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import { db, stages, contentItems, contentTypes, questions, projects } from '@/db';
-import { eq, sql, count } from 'drizzle-orm';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { ContentProgress } from '@/components/ContentProgress';
-import { EmptyState } from '@/components/EmptyState';
-import { getDifficultyColor } from '@/lib/utils';
-import { VerifiedBadge } from '@/components/VerifiedBadge';
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import {
+  db,
+  stages,
+  contentItems,
+  contentTypes,
+  questions,
+  projects,
+} from "@/db";
+import { eq, sql, count } from "drizzle-orm";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { ContentProgress } from "@/components/ContentProgress";
+import { EmptyState } from "@/components/EmptyState";
+import { getDifficultyColor } from "@/lib/utils";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 
 interface Props {
   params: Promise<{ slug: string }>;
+}
+
+// Content item type
+type ContentItem = {
+  id: number;
+  title: string;
+  description: string | null;
+  difficulty: string | null;
+  isAvailable: boolean;
+  order: number;
+  contentType: { slug: string; name: string } | null;
+  question: {
+    id: number;
+    sourceCompany: string | null;
+    isVerified: boolean;
+  } | null;
+  project: { id: number; estimatedHours: number | null } | null;
+};
+
+// Reusable content item card component
+function ContentItemCard({ item }: { item: ContentItem }) {
+  const isQuestion = item.question?.id;
+  const isProject = item.project?.id;
+  const href = isQuestion
+    ? `/questions/${item.id}`
+    : isProject
+      ? `/projects/${item.id}`
+      : "#";
+
+  return (
+    <Link href={href}>
+      <Card
+        className={`hover:shadow-md transition-shadow cursor-pointer ${!item.isAvailable ? "opacity-60" : ""}`}
+      >
+        <CardContent className="py-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-medium text-gray-900">{item.title}</h3>
+                {!item.isAvailable && (
+                  <Badge variant="default">Coming Soon</Badge>
+                )}
+              </div>
+              {item.description && (
+                <p className="text-sm text-gray-500 line-clamp-2">
+                  {item.description}
+                </p>
+              )}
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                {item.contentType?.name && (
+                  <Badge variant="default">{item.contentType.name}</Badge>
+                )}
+                {item.difficulty && (
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getDifficultyColor(item.difficulty)}`}
+                  >
+                    {item.difficulty}
+                  </span>
+                )}
+                {item.project?.estimatedHours && (
+                  <span className="text-xs text-gray-500">
+                    ~{item.project.estimatedHours}h
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex flex-col items-end gap-2">
+              {item.question?.isVerified && <VerifiedBadge />}
+              {item.question?.sourceCompany && (
+                <span className="text-xs text-gray-500">
+                  {item.question.sourceCompany}
+                </span>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
 }
 
 async function getStage(slug: string) {
@@ -125,60 +211,91 @@ export default async function StagePage({ params }: Props) {
           title="No content yet"
           description="Content for this stage is coming soon. Check back later!"
         />
-      ) : (
-        <div className="space-y-4">
-          {content.map((item) => {
-            const isQuestion = item.question?.id;
-            const isProject = item.project?.id;
-            const href = isQuestion
-              ? `/questions/${item.id}`
-              : isProject
-              ? `/projects/${item.id}`
-              : '#';
-
-            return (
-              <Link key={item.id} href={href}>
-                <Card className={`hover:shadow-md transition-shadow cursor-pointer ${!item.isAvailable ? 'opacity-60' : ''}`}>
-                  <CardContent className="py-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-gray-900">{item.title}</h3>
-                          {!item.isAvailable && (
-                            <Badge variant="default">Coming Soon</Badge>
-                          )}
-                        </div>
-                        {item.description && (
-                          <p className="text-sm text-gray-500 line-clamp-2">{item.description}</p>
-                        )}
-                        <div className="flex flex-wrap items-center gap-2 mt-2">
-                          {item.contentType?.name && (
-                            <Badge variant="default">{item.contentType.name}</Badge>
-                          )}
-                          {item.difficulty && (
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getDifficultyColor(item.difficulty)}`}>
-                              {item.difficulty}
-                            </span>
-                          )}
-                          {item.project?.estimatedHours && (
-                            <span className="text-xs text-gray-500">
-                              ~{item.project.estimatedHours}h
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        {item.question?.isVerified && <VerifiedBadge />}
-                        {item.question?.sourceCompany && (
-                          <span className="text-xs text-gray-500">{item.question.sourceCompany}</span>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+      ) : slug === "ml-ready" ? (
+        // ML Ready stage: separate into ML Concepts and ML Coding sections
+        <div className="space-y-8">
+          {/* ML Concepts Section */}
+          {(() => {
+            const mlConcepts = content.filter(
+              (item) => item.contentType?.slug === "ml_concept",
             );
-          })}
+            if (mlConcepts.length === 0) return null;
+            return (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">📖</span>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    ML Concepts (八股文)
+                  </h2>
+                  <Badge variant="info">{mlConcepts.length}</Badge>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Master the theoretical foundations - common interview
+                  questions about ML concepts, algorithms, and theory.
+                </p>
+                <div className="space-y-3">
+                  {mlConcepts.map((item) => (
+                    <ContentItemCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ML Coding Section */}
+          {(() => {
+            const mlCoding = content.filter(
+              (item) => item.contentType?.slug === "ml_coding",
+            );
+            if (mlCoding.length === 0) return null;
+            return (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">💻</span>
+                  <h2 className="text-xl font-bold text-gray-900">ML Coding</h2>
+                  <Badge variant="info">{mlCoding.length}</Badge>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Implement ML algorithms from scratch - gradient descent,
+                  regularization, neural networks, and more.
+                </p>
+                <div className="space-y-3">
+                  {mlCoding.map((item) => (
+                    <ContentItemCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Other content (if any) */}
+          {(() => {
+            const other = content.filter(
+              (item) =>
+                item.contentType?.slug !== "ml_concept" &&
+                item.contentType?.slug !== "ml_coding",
+            );
+            if (other.length === 0) return null;
+            return (
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                  Other Resources
+                </h2>
+                <div className="space-y-3">
+                  {other.map((item) => (
+                    <ContentItemCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      ) : (
+        // Other stages: show all content in a single list
+        <div className="space-y-4">
+          {content.map((item) => (
+            <ContentItemCard key={item.id} item={item} />
+          ))}
         </div>
       )}
     </div>
