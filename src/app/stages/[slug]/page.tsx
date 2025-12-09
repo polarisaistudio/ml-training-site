@@ -15,6 +15,7 @@ import { ContentProgress } from "@/components/ContentProgress";
 import { EmptyState } from "@/components/EmptyState";
 import { getDifficultyColor } from "@/lib/utils";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { ResumeReadyTracker } from "@/components/ResumeReadyTracker";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -206,7 +207,10 @@ export default async function StagePage({ params }: Props) {
       </div>
 
       {/* Content List */}
-      {content.length === 0 ? (
+      {slug === "resume-ready" ? (
+        // Resume Ready stage: show the project tracker
+        <ResumeReadyTracker />
+      ) : content.length === 0 ? (
         <EmptyState
           title="No content yet"
           description="Content for this stage is coming soon. Check back later!"

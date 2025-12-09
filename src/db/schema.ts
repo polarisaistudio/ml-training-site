@@ -222,6 +222,93 @@ export const userSolutionsRelations = relations(userSolutions, ({ one }) => ({
   }),
 }));
 
+// Resume Ready - Main progress tracking
+export const resumeReadyProgress = pgTable("resume_ready_progress", {
+  sessionId: varchar("session_id", { length: 100 }).primaryKey(),
+
+  // Overall status
+  readinessScore: integer("readiness_score").default(0).notNull(), // 0-100
+  status: varchar("status", { length: 20 }).default("not-started").notNull(), // 'not-started' | 'in-progress' | 'ready'
+
+  // Completed projects
+  completedProjects: jsonb("completed_projects")
+    .$type<
+      {
+        templateId: string;
+        completedAt: string;
+        selectedResumeStyle: "technical" | "impact" | "fullStack";
+        questionsReviewed: string[];
+      }[]
+    >()
+    .default([])
+    .notNull(),
+
+  // Resume tracking
+  resumeBulletsCount: integer("resume_bullets_count").default(0).notNull(),
+  resumeLastUpdated: timestamp("resume_last_updated"),
+
+  // Interview prep tracking
+  totalQuestionsReviewed: integer("total_questions_reviewed")
+    .default(0)
+    .notNull(),
+
+  // Expert help
+  expertCallBooked: boolean("expert_call_booked").default(false).notNull(),
+  expertCallDate: timestamp("expert_call_date"),
+
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Resume Ready - Individual project completion tracking
+export const projectCompletions = pgTable("project_completions", {
+  id: serial("id").primaryKey(),
+  sessionId: varchar("session_id", { length: 100 }).notNull(),
+  projectTemplateId: varchar("project_template_id", { length: 100 }).notNull(),
+
+  status: varchar("status", { length: 20 }).default("not-started").notNull(), // 'not-started' | 'in-progress' | 'completed'
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+
+  // Tutorial progress (array of step indices)
+  completedSteps: jsonb("completed_steps")
+    .$type<number[]>()
+    .default([])
+    .notNull(),
+
+  // Resume selection
+  selectedResumeStyle: varchar("selected_resume_style", { length: 20 }), // 'technical' | 'impact' | 'fullStack' | null
+  bulletsCopied: boolean("bullets_copied").default(false).notNull(),
+
+  // Interview prep
+  reviewedQuestions: jsonb("reviewed_questions")
+    .$type<string[]>()
+    .default([])
+    .notNull(),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Resume Ready Relations
+export const resumeReadyProgressRelations = relations(
+  resumeReadyProgress,
+  ({ many }) => ({
+    projectCompletions: many(projectCompletions),
+  }),
+);
+
+export const projectCompletionsRelations = relations(
+  projectCompletions,
+  ({ one }) => ({
+    progress: one(resumeReadyProgress, {
+      fields: [projectCompletions.sessionId],
+      references: [resumeReadyProgress.sessionId],
+    }),
+  }),
+);
+
 // Type exports
 export type Stage = typeof stages.$inferSelect;
 export type NewStage = typeof stages.$inferInsert;
@@ -241,3 +328,7 @@ export type QuestionProgress = typeof questionProgress.$inferSelect;
 export type NewQuestionProgress = typeof questionProgress.$inferInsert;
 export type UserSolution = typeof userSolutions.$inferSelect;
 export type NewUserSolution = typeof userSolutions.$inferInsert;
+export type ResumeReadyProgress = typeof resumeReadyProgress.$inferSelect;
+export type NewResumeReadyProgress = typeof resumeReadyProgress.$inferInsert;
+export type ProjectCompletion = typeof projectCompletions.$inferSelect;
+export type NewProjectCompletion = typeof projectCompletions.$inferInsert;
