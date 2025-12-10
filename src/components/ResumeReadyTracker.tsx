@@ -504,6 +504,51 @@ export function ResumeReadyTracker() {
         </div>
       </div>
 
+      {/* Interview Prep Section */}
+      <div>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">
+          Interview Preparation
+        </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Practice behavioral and technical questions to ace your interviews.
+        </p>
+
+        <Link href="/resume-ready/interview-prep">
+          <Card className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.01] hover:border-indigo-300 group">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <div className="text-4xl flex-shrink-0 group-hover:scale-110 transition-transform">
+                  🎯
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg mb-1 group-hover:text-indigo-600 transition-colors">
+                    Behavioral Questions
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    10 must-know questions with STAR-format answers, practice
+                    timer, and personal notes.
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge variant="secondary" className="text-xs">
+                      10 Questions
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      STAR Format
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      Practice Timer
+                    </Badge>
+                  </div>
+                </div>
+                <div className="text-gray-400 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all flex-shrink-0">
+                  →
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
       {/* Projects Grid */}
       <div ref={projectsRef}>
         <h2 className="text-xl font-bold text-gray-900 mb-2">
