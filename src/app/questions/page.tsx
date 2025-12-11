@@ -221,14 +221,14 @@ async function QuestionsContent({
       {/* Real Interview Priority Banner - show only if there are real questions and no source filter */}
       {realCount > 0 &&
         (!searchParams.source || searchParams.source === "all") && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-900 font-semibold mb-1">
-              🎯 {realCount} Real Interview Question{realCount > 1 ? "s" : ""}{" "}
-              Available
+          <div className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 rounded-lg p-5 mb-6">
+            <p className="text-red-900 font-bold text-lg mb-1">
+              🎯 {realCount} real interview question{realCount > 1 ? "s" : ""}{" "}
+              collected so far
             </p>
             <p className="text-red-700 text-sm">
-              Questions from actual interviews are shown first. They&apos;re the
-              most valuable for preparation.
+              Questions I personally encountered in interviews — more coming as
+              I interview! These are shown first with a red background.
             </p>
           </div>
         )}

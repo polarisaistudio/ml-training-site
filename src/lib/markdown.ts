@@ -3,6 +3,19 @@
  * Extracts sections (Question, Answer, Hints, Learning Resources) from markdown
  */
 
+/**
+ * Convert a problem title to a LeetCode URL slug
+ * e.g., "Reverse Linked List II" -> "reverse-linked-list-ii"
+ */
+function titleToLeetcodeSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single
+    .replace(/^-|-$/g, ""); // Trim leading/trailing hyphens
+}
+
 export interface Hint {
   level: number;
   content: string;
@@ -27,10 +40,16 @@ export interface LearningResource {
   url: string;
 }
 
+export interface RelatedProblem {
+  title: string;
+  url?: string;
+  leetcodeNumber?: number;
+}
+
 export interface ParsedLearningResources {
   videos: LearningResource[];
   articles: LearningResource[];
-  relatedProblems: string[];
+  relatedProblems: RelatedProblem[];
 }
 
 /**
@@ -184,7 +203,7 @@ export function parseLearningResources(
   }
 
   if (relatedMatch) {
-    // Parse related problems - they may or may not have links
+    // Parse related problems - extract LeetCode numbers and create links
     const lines = relatedMatch[1]
       .split("\n")
       .filter((line) => line.trim().startsWith("-"));
@@ -192,7 +211,32 @@ export function parseLearningResources(
       // Remove the leading "- " and trim
       const problem = line.replace(/^-\s*/, "").trim();
       if (problem) {
-        result.relatedProblems.push(problem);
+        // Check if it already has a markdown link
+        const existingLinkMatch = problem.match(/\[([^\]]+)\]\(([^)]+)\)/);
+        if (existingLinkMatch) {
+          result.relatedProblems.push({
+            title: existingLinkMatch[1],
+            url: existingLinkMatch[2],
+          });
+        } else {
+          // Try to extract LeetCode number from formats like "(LeetCode #92)" or "(#92)"
+          const leetcodeMatch = problem.match(/\((?:LeetCode\s*)?#(\d+)\)/i);
+          if (leetcodeMatch) {
+            const leetcodeNumber = parseInt(leetcodeMatch[1], 10);
+            // Remove the LeetCode reference from the title for cleaner display
+            const title = problem
+              .replace(/\s*\((?:LeetCode\s*)?#\d+\)\s*/, "")
+              .trim();
+            result.relatedProblems.push({
+              title: title || problem,
+              url: `https://leetcode.com/problems/${titleToLeetcodeSlug(title)}/`,
+              leetcodeNumber,
+            });
+          } else {
+            // No LeetCode number found, just store as plain text
+            result.relatedProblems.push({ title: problem });
+          }
+        }
       }
     }
   }

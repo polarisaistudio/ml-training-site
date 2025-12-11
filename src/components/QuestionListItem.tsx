@@ -55,7 +55,9 @@ export function QuestionListItem({
             ? "border-green-200 bg-green-50/30"
             : question.inProgress
               ? "border-blue-200 bg-blue-50/30"
-              : "border-gray-200 hover:border-blue-300 bg-white"
+              : question.sourceType === "real-interview"
+                ? "border-red-200 bg-red-50/50 hover:border-red-300"
+                : "border-gray-200 hover:border-blue-300 bg-white"
         }`}
       >
         <div className="flex items-start gap-4">

@@ -10,10 +10,12 @@ export function middleware(request: NextRequest) {
   // Create response to potentially modify
   let response = NextResponse.next();
 
-  // Set session cookie for anonymous user tracking on questions pages
+  // Set session cookie for anonymous user tracking on questions and resume-ready pages
   if (
     pathname.startsWith("/questions") ||
-    pathname.startsWith("/api/questions")
+    pathname.startsWith("/api/questions") ||
+    pathname.startsWith("/resume-ready") ||
+    pathname.startsWith("/api/resume-ready")
   ) {
     const existingSession = request.cookies.get(SESSION_COOKIE_NAME);
 
@@ -44,5 +46,11 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/questions/:path*", "/api/questions/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/questions/:path*",
+    "/api/questions/:path*",
+    "/resume-ready/:path*",
+    "/api/resume-ready/:path*",
+  ],
 };

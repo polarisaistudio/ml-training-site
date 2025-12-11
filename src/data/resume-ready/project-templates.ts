@@ -474,7 +474,6 @@ Update \`app.py\`:
 
 from flask import Flask, request, jsonify, g
 from transformers import pipeline
-from functools import lru_cache
 import hashlib
 import time
 import logging
@@ -627,7 +626,8 @@ def analyze_batch():
             batch_results = classifier(texts_to_process)
             inference_time = (time.time() - start) * 1000
 
-            for idx, (br, text) in zip(indices_to_process, zip(batch_results, texts_to_process)):
+            for i, (idx, text) in enumerate(zip(indices_to_process, texts_to_process)):
+                br = batch_results[i]
                 result = {
                     'label': br['label'],
                     'score': round(br['score'], 4),
@@ -637,7 +637,7 @@ def analyze_batch():
                 results[idx] = result
                 set_cached_result(text, result)
 
-        cache_hits = sum(1 for r in results if r.get('cached'))
+        cache_hits = sum(1 for r in results if r and r.get('cached'))
 
         return jsonify({
             'results': results,

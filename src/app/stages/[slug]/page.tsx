@@ -203,7 +203,11 @@ export default async function StagePage({ params }: Props) {
 
       {/* Progress */}
       <div className="mb-8 max-w-md">
-        <ContentProgress available={counts.available} total={counts.total} />
+        <ContentProgress
+          available={counts.available}
+          total={counts.total}
+          label="items"
+        />
       </div>
 
       {/* Content List */}

@@ -118,10 +118,10 @@ export default async function RoadmapPage() {
           <ContentProgress
             available={overall.available}
             total={overall.total || 1}
+            label="items"
           />
           <p className="mt-4 text-sm text-gray-500">
-            {overall.available} items available out of {overall.total} planned
-            so far.
+            {overall.available} items out of {overall.total} planned so far.
           </p>
         </CardContent>
       </Card>
@@ -148,6 +148,7 @@ export default async function RoadmapPage() {
                 <ContentProgress
                   available={Number(stage.available)}
                   total={Number(stage.total) || 1}
+                  label="items"
                 />
               </div>
             ))}
@@ -175,6 +176,7 @@ export default async function RoadmapPage() {
                 <ContentProgress
                   available={Number(type.available)}
                   total={Number(type.total) || 1}
+                  label="items"
                 />
               </div>
             ))}

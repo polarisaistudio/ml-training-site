@@ -1,7 +1,13 @@
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { ContentProgress } from '@/components/ContentProgress';
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { ContentProgress } from "@/components/ContentProgress";
 
 interface StageCardProps {
   slug: string;
@@ -44,7 +50,11 @@ export function StageCard({
               <span className="text-sm text-gray-600">{goal}</span>
             </div>
           )}
-          <ContentProgress available={availableCount} total={totalCount} />
+          <ContentProgress
+            available={availableCount}
+            total={totalCount}
+            label="items"
+          />
         </CardContent>
       </Card>
     </Link>
