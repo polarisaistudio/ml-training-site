@@ -63,7 +63,7 @@ function QuestionCard({
   onToggleReview: (id: string) => void;
 }) {
   const categoryMeta = QUESTION_CATEGORIES_META.find(
-    (c) => c.id === question.category
+    (c) => c.id === question.category,
   );
 
   return (
@@ -124,7 +124,8 @@ function QuestionCard({
 
             {/* What they're looking for preview */}
             <p className="text-sm text-gray-500 mt-1 line-clamp-1">
-              Looking for: {question.whatTheyreLookingFor.slice(0, 2).join(", ")}
+              Looking for:{" "}
+              {question.whatTheyreLookingFor.slice(0, 2).join(", ")}
             </p>
 
             {/* Tags */}
@@ -246,7 +247,7 @@ export default function InterviewPrepPage() {
   const criticalQuestions = getCriticalQuestions();
   const highPriorityQuestions = getHighPriorityQuestions();
   const mediumQuestions = BEHAVIORAL_QUESTIONS.filter(
-    (q) => q.priority === "medium"
+    (q) => q.priority === "medium",
   );
 
   const totalReviewed = reviewedIds.size;
@@ -277,7 +278,7 @@ export default function InterviewPrepPage() {
           Behavioral Interview Prep
         </h1>
         <p className="text-lg text-gray-600">
-          Master the 10 most common behavioral questions for ML/AI engineering
+          Master the most common behavioral questions for ML/AI engineering
           interviews. Each question includes STAR-format example answers based
           on your Sentiment Analysis project.
         </p>
@@ -322,8 +323,11 @@ export default function InterviewPrepPage() {
             </div>
             <div className="bg-white/60 rounded-lg p-3">
               <div className="text-2xl font-bold text-orange-600">
-                {highPriorityQuestions.filter((q) => reviewedIds.has(q.id)).length}/
-                {highPriorityQuestions.length}
+                {
+                  highPriorityQuestions.filter((q) => reviewedIds.has(q.id))
+                    .length
+                }
+                /{highPriorityQuestions.length}
               </div>
               <div className="text-xs text-gray-600">High Priority</div>
             </div>
@@ -406,7 +410,7 @@ export default function InterviewPrepPage() {
       {viewMode === "category" &&
         QUESTION_CATEGORIES_META.map((category) => {
           const categoryQuestions = BEHAVIORAL_QUESTIONS.filter(
-            (q) => q.category === category.id
+            (q) => q.category === category.id,
           );
           if (categoryQuestions.length === 0) return null;
 

@@ -929,6 +929,231 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
       "critical",
     ],
   },
+
+  // ============================================================================
+  // QUESTION 14: AI-Powered Applications Experience
+  // ============================================================================
+
+  {
+    id: "technical-04",
+    category: "technical",
+    question:
+      "Have you built any AI-powered applications (LLM, RAG, agents, or similar)?",
+    difficulty: "medium",
+    priority: "critical",
+    estimatedPrepTime: "15-20 minutes",
+
+    whatTheyreLookingFor: [
+      "Practical experience with modern AI technologies (LLMs, RAG)",
+      "Understanding of how to build complete applications, not just run models",
+      "Real-world problem-solving with AI",
+      "Awareness of challenges like latency, cost, prompt engineering",
+    ],
+
+    starFramework: {
+      situation:
+        "What AI application did you build? What problem did it solve?",
+      task: "What were the technical requirements and constraints?",
+      action:
+        "How did you architect and implement it? What technologies did you use?",
+      result: "What was the outcome? What challenges did you overcome?",
+    },
+
+    exampleAnswer: {
+      situation:
+        "Yes, I've built several AI-powered applications. The most substantial one was my sentiment analysis API using a BERT transformer model. While this predates the current LLM wave, it follows similar principles—taking a pre-trained model and building a production application around it.",
+
+      task: "The goal was to create a production-ready API that could analyze customer feedback sentiment in real-time. The technical requirements were: (1) High accuracy (target 85%+), (2) Low latency (<200ms for good UX), (3) Handle concurrent requests (50+ users), (4) Be cost-effective to run. These are the same considerations you face with LLM applications—balancing quality, speed, and cost.",
+
+      action:
+        "For the architecture: I used DistilBERT as the base model—similar to how you might use GPT-3.5 for cost-effectiveness over GPT-4. Built a Flask REST API wrapper around it. Implemented three key optimizations: (1) LRU caching for repeated queries—achieved 95%+ cache hit rate, crucial for cost with LLMs too. (2) Batch processing for multiple texts—similar to batching LLM calls. (3) Proper production deployment with Gunicorn and monitoring. I also built a web interface for easy interaction and deployed the complete system to Railway.\n\nRegarding more recent LLM work: I've been experimenting with RAG (Retrieval-Augmented Generation) architectures using LangChain and vector databases like Pinecone. For my consulting business, I've helped clients implement chatbots using OpenAI's API with custom knowledge bases. The key challenges there were: prompt engineering to reduce hallucinations, managing context windows, implementing semantic search for relevant document retrieval, and cost optimization through caching and smart prompt design.",
+
+      result:
+        "The sentiment analysis API achieved 89% accuracy with <200ms response time and successfully handled production load. More importantly, building this taught me the principles of production AI systems: (1) Model selection based on latency/cost tradeoffs, (2) Optimization through caching and batching, (3) Monitoring and error handling, (4) User experience considerations. These principles apply directly to LLM applications—whether it's BERT or GPT, you're solving the same production engineering problems. I'm excited to apply these lessons to building more advanced LLM-powered applications with RAG and agentic workflows.",
+    },
+
+    pitfalls: [
+      'Saying "no" without elaborating on related experience',
+      "Only mentioning that you used ChatGPT API without showing understanding",
+      "Not explaining the architecture or technical decisions",
+      "Claiming experience you don't have (they will dig deeper)",
+      "Focusing only on the model without discussing the application layer",
+      "Not acknowledging limitations or challenges you faced",
+    ],
+
+    tips: [
+      "If you have LLM/RAG experience: explain architecture, challenges, and tradeoffs",
+      "If you don't: connect related experience (like sentiment analysis → LLM APIs)",
+      "Show you understand key concepts: prompt engineering, context management, RAG, vector databases",
+      "Mention practical concerns: latency, cost, hallucinations, safety",
+      "Be honest about what you've built vs what you've experimented with",
+      "Demonstrate learning: \"I haven't built X yet, but I've been studying Y and Z\"",
+      "Connect to the role: \"I'm excited to work on [company's LLM product]\"",
+    ],
+
+    followUpQuestions: [
+      "What was the most challenging part of building that application?",
+      "How did you handle prompt engineering and prevent hallucinations?",
+      "What vector database did you use for RAG? Why?",
+      "How did you optimize costs when using LLM APIs?",
+      "What metrics did you use to evaluate your AI application?",
+      "Have you worked with fine-tuning LLMs?",
+    ],
+
+    tags: ["technical", "llm", "rag", "agents", "modern-ai", "critical"],
+  },
+
+  // ============================================================================
+  // QUESTION 15: Model Deployment Experience
+  // ============================================================================
+
+  {
+    id: "technical-05",
+    category: "technical",
+    question: "Have you taken a model from development to deployment before?",
+    difficulty: "medium",
+    priority: "critical",
+    estimatedPrepTime: "15-20 minutes",
+
+    whatTheyreLookingFor: [
+      "End-to-end ML experience (not just training models in notebooks)",
+      "Understanding of production ML challenges",
+      "DevOps/MLOps awareness",
+      "Real-world deployment experience vs academic projects",
+    ],
+
+    starFramework: {
+      situation: "What model did you deploy? What was the use case?",
+      task: "What were the deployment requirements (latency, scale, reliability)?",
+      action:
+        "Walk through your deployment process: infrastructure, serving, monitoring",
+      result: "Did it work in production? What did you learn about deployment?",
+    },
+
+    exampleAnswer: {
+      situation:
+        "Yes, I deployed my sentiment analysis model to production. While it's a personal project rather than enterprise-scale, I went through the complete deployment lifecycle to understand production ML challenges firsthand.",
+
+      task: "The deployment requirements were: (1) Publicly accessible API, (2) Handle real user traffic (targeting 50+ concurrent users), (3) Response time <200ms, (4) Reliable uptime, (5) Monitoring and logging for debugging. I needed to transform a model that worked in my Jupyter notebook into a production service.",
+
+      action:
+        "Here's my complete deployment process:\n\n**Model Serving**: I containerized the application with Docker to ensure consistency across environments. The container includes Python 3.10, PyTorch, transformers library, and Flask. Used Gunicorn as the production WSGI server with 2 worker processes—learned that Flask's dev server isn't production-ready the hard way (it crashed under load initially).\n\n**Infrastructure**: Deployed to Railway (PaaS). While not as sophisticated as Kubernetes, it taught me about: environment variables for configuration, health checks for container orchestration, horizontal scaling principles (though I only run 1 instance currently). The deployment is git-based—push to main branch triggers rebuild and redeployment.\n\n**Optimization**: Implemented LRU caching for repeated queries, reducing 95%+ of model inference calls. Added batch processing for multiple text inputs. These optimizations were crucial—initial response time was 800ms, optimized to <200ms.\n\n**Monitoring & Logging**: Implemented: (1) Health check endpoint for uptime monitoring, (2) Request/response logging with timestamps and latency, (3) Error tracking and stack traces, (4) Simple metrics tracking (requests per minute, cache hit rate, average response time). No fancy tools like Prometheus yet, but I understand the importance.\n\n**API Design**: RESTful API with proper error handling, input validation, and meaningful HTTP status codes. Documented endpoints and expected request/response formats.",
+
+      result:
+        "The deployed system has been running reliably for several months at https://[your-url].railway.app. It successfully handles concurrent requests, maintains <200ms response times, and has 99%+ uptime. Most importantly, this experience taught me that deployment is where the real challenges appear: (1) What works in development often breaks in production (learned about production servers, concurrent requests, resource limits). (2) Optimization is crucial—caching and batching made the difference between unusable and production-ready. (3) Monitoring is not optional—you need visibility into performance and errors. (4) User experience matters—latency, error messages, API design all affect adoption.\n\nI understand my deployment is simpler than enterprise ML systems with A/B testing, canary deployments, model versioning, and sophisticated monitoring. But I intentionally went through the deployment process to learn production ML principles. I'm eager to learn more advanced MLOps practices like model registries, automated retraining pipelines, and deployment strategies at scale.",
+    },
+
+    pitfalls: [
+      'Saying you "deployed" but only saved a pickle file',
+      "Only talking about training without discussing serving/infrastructure",
+      "Not understanding the difference between development and production",
+      "Claiming enterprise-level deployment experience when you haven't",
+      "Focusing only on the model without discussing the system around it",
+      "Not acknowledging what you haven't done yet",
+    ],
+
+    tips: [
+      "Be specific about your deployment stack (Docker, Flask, cloud platform)",
+      "Emphasize what you learned, even if deployment was simple",
+      "Show you understand production concerns: latency, monitoring, errors, scale",
+      "If you haven't deployed: talk about what you would do and why",
+      "Mention challenges you faced and how you solved them",
+      'Acknowledge limitations honestly: "This was simpler than enterprise systems, but..."',
+      'Connect to role: "I want to learn more advanced MLOps practices like X and Y"',
+    ],
+
+    followUpQuestions: [
+      "What deployment platform did you use and why?",
+      "How did you handle model versioning?",
+      "What monitoring metrics do you track in production?",
+      "Have you implemented A/B testing for models?",
+      "How do you handle model updates without downtime?",
+      "What's your strategy for handling production errors?",
+      "Have you worked with Kubernetes or model serving frameworks like TensorFlow Serving?",
+    ],
+
+    tags: ["technical", "deployment", "mlops", "production", "critical"],
+  },
+
+  // ============================================================================
+  // QUESTION 16: Data Pipeline & Preparation Experience
+  // ============================================================================
+
+  {
+    id: "technical-06",
+    category: "technical",
+    question:
+      "Do you have hands-on experience preparing data or building pipelines for ML systems?",
+    difficulty: "medium",
+    priority: "high",
+    estimatedPrepTime: "15-20 minutes",
+
+    whatTheyreLookingFor: [
+      "Understanding that data work is 80% of ML",
+      "Experience with data cleaning, transformation, feature engineering",
+      "Knowledge of data pipeline tools and best practices",
+      "Awareness of data quality issues and how they affect models",
+    ],
+
+    starFramework: {
+      situation: "What data challenge or pipeline did you work on?",
+      task: "What was required? What problems needed solving?",
+      action: "How did you build/improve the pipeline? What tools did you use?",
+      result: "What was the impact on data quality or model performance?",
+    },
+
+    exampleAnswer: {
+      situation:
+        "While I haven't built large-scale enterprise data pipelines yet, I have hands-on experience with data preparation across several projects. In my sentiment analysis project, I worked with messy real-world text data. In my consulting work at Polaris AI Studio, I've helped clients prepare data for ML models—this taught me that data preparation is where most of the actual work happens.",
+
+      task: "For the sentiment analysis project, I needed to: (1) Handle diverse text formats (product reviews, social media comments, customer feedback), (2) Clean noisy data (HTML tags, special characters, emojis, inconsistent encoding), (3) Deal with class imbalance (much more positive than negative samples), (4) Ensure data quality before fine-tuning. For client projects: extract data from various sources (CSV, databases, APIs), transform it into ML-ready format, handle missing values and outliers, create train/validation/test splits that reflect production distribution.",
+
+      action:
+        "Here's my data preparation workflow:\n\n**Data Collection & Exploration**: Used pandas for data loading and initial exploration. Always start with: data.info(), data.describe(), checking for nulls, visualizing distributions with matplotlib. This reveals data quality issues early—found encoding problems, duplicate entries, and unexpected values.\n\n**Cleaning & Preprocessing**: For text data: (1) Handled special characters and encoding issues (UTF-8 normalization), (2) Removed HTML tags and URLs using regex, (3) Normalized whitespace and case, (4) Decided on emoji handling—keep for social media data, remove for formal text. For structured data: (1) Handled missing values (imputation vs removal based on pattern analysis), (2) Detected and handled outliers (IQR method, domain knowledge), (3) Data type conversions and validation.\n\n**Feature Engineering**: Created domain-specific features: text length, word count, sentiment lexicon scores, presence of negation words. For tabular data: created interaction features, binning continuous variables, one-hot encoding categorical variables. Used sklearn pipelines to make preprocessing reproducible.\n\n**Data Validation**: Implemented data quality checks: (1) Schema validation (expected columns, types), (2) Value range checks (no negative ages, reasonable bounds), (3) Consistency checks (dates in order, totals match sums), (4) Distribution monitoring (detect drift over time).\n\n**Train/Val/Test Splits**: Used stratified sampling to maintain class distribution. For time-series aware problems, used temporal splits. Always held out a test set completely untouched until final evaluation.\n\n**Pipeline Structure**: Built reusable sklearn pipelines combining preprocessing steps. This ensures: same transformations applied consistently to train/val/test, easy to version and reproduce, no data leakage (fit only on training data).",
+
+      result:
+        "These data preparation practices improved model performance significantly. In sentiment analysis: proper text cleaning improved accuracy by ~5%. Handling class imbalance through stratified sampling improved minority class recall. Most importantly, I learned that data preparation is not a one-time task—it's iterative. You prepare data, train model, analyze errors, realize you need better data preparation, repeat.\n\nData quality directly affects model performance. I saw this when: (1) Including low-quality data reduced accuracy—learned to implement data filtering, (2) Not handling encoding properly caused training failures, (3) Data leakage from improper splitting gave falsely high validation scores. These experiences taught me to be paranoid about data quality and suspicious of results that seem too good.\n\nFor more advanced pipelines: I understand modern tools like Airflow for orchestration, dbt for data transformation, feature stores like Feast, but haven't used them in production yet. I'm eager to learn enterprise-scale data engineering, especially for scenarios with: streaming data requiring real-time processing, distributed processing with Spark, data versioning with DVC, automated data quality monitoring.",
+    },
+
+    pitfalls: [
+      'Claiming you just "loaded a CSV and trained a model" without any data work',
+      "Not acknowledging how much time data preparation actually takes",
+      "Focusing only on modeling without discussing data challenges",
+      "Not understanding data leakage or train/test contamination",
+      "Not being specific about tools and techniques you used",
+      "Ignoring data quality issues and their impact on models",
+    ],
+
+    tips: [
+      "Emphasize that you understand data work is most of ML (80/20 rule)",
+      "Give specific examples: what issues you found, how you fixed them",
+      "Mention tools: pandas, sklearn pipelines, data validation libraries",
+      "Show you think about data quality, not just model accuracy",
+      "Discuss train/val/test splits and avoiding data leakage",
+      "If limited experience: mention what you'd want to learn (Airflow, Spark, dbt)",
+      "Connect data quality to model performance with concrete examples",
+      "Show iterative mindset: data prep → modeling → error analysis → better data prep",
+    ],
+
+    followUpQuestions: [
+      "How do you handle missing data?",
+      "What's your approach to feature engineering?",
+      "Have you worked with streaming data or batch processing?",
+      "How do you detect data drift in production?",
+      "What tools have you used for data pipeline orchestration?",
+      "How do you ensure train/test splits don't leak data?",
+      "Have you worked with large-scale data that doesn't fit in memory?",
+      "How do you handle class imbalance?",
+    ],
+
+    tags: [
+      "technical",
+      "data-pipeline",
+      "data-engineering",
+      "feature-engineering",
+      "high-priority",
+    ],
+  },
 ];
 
 // ============================================================================

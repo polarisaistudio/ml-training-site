@@ -525,12 +525,12 @@ export function ResumeReadyTracker() {
                     Behavioral Questions
                   </h3>
                   <p className="text-sm text-gray-600 mb-3">
-                    10 must-know questions with STAR-format answers, practice
+                    16 must-know questions with STAR-format answers, practice
                     timer, and personal notes.
                   </p>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge variant="secondary" className="text-xs">
-                      10 Questions
+                      16 Questions
                     </Badge>
                     <Badge variant="secondary" className="text-xs">
                       STAR Format
@@ -541,6 +541,52 @@ export function ResumeReadyTracker() {
                   </div>
                 </div>
                 <div className="text-gray-400 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all flex-shrink-0">
+                  →
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
+      {/* Cover Letter Guide Section */}
+      <div>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">
+          Application Materials
+        </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Guides and templates to help you craft compelling application
+          materials.
+        </p>
+
+        <Link href="/resume-ready/cover-letter-guide">
+          <Card className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.01] hover:border-green-300 group">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <div className="text-4xl flex-shrink-0 group-hover:scale-110 transition-transform">
+                  📝
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg mb-1 group-hover:text-green-600 transition-colors">
+                    Cover Letter Writing Guide
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Complete guide with templates for startups, big tech, and
+                    research labs. Includes examples using your ML projects.
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge variant="secondary" className="text-xs">
+                      3 Templates
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      Company Research Tips
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      Common Mistakes
+                    </Badge>
+                  </div>
+                </div>
+                <div className="text-gray-400 group-hover:text-green-500 group-hover:translate-x-1 transition-all flex-shrink-0">
                   →
                 </div>
               </div>
