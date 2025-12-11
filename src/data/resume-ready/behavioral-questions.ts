@@ -1154,6 +1154,265 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
       "high-priority",
     ],
   },
+
+  // ============================================================================
+  // QUESTION 17: Keeping Up with AI Innovation
+  // ============================================================================
+
+  {
+    id: "learning-02",
+    category: "learning",
+    question:
+      "How do you keep up with innovation in the AI space? What resources do you use?",
+    difficulty: "medium",
+    priority: "high",
+    estimatedPrepTime: "15-20 minutes",
+
+    whatTheyreLookingFor: [
+      "Genuine passion for ML/AI (not just a job)",
+      "Active learning and staying current",
+      "Systematic approach to learning (not just random browsing)",
+      "Balance between theory and practice",
+      "Ability to filter signal from noise in a fast-moving field",
+    ],
+
+    starFramework: {
+      situation: "Why staying current matters in AI/ML",
+      task: "Your approach to continuous learning in a rapidly evolving field",
+      action: "Specific resources, habits, and practices you use",
+      result: "How this helps you in your work and career",
+    },
+
+    exampleAnswer: {
+      situation:
+        "AI/ML is evolving incredibly fast—new models, techniques, and tools emerge constantly. What was state-of-the-art six months ago might be outdated today. As someone transitioning into ML engineering, I knew that staying current wasn't optional—it's essential to remain effective and relevant in this field.",
+
+      task: "I needed to develop a systematic approach to continuous learning that balanced: (1) Depth in foundational concepts, (2) Awareness of cutting-edge developments, (3) Hands-on practice with new tools, (4) Avoiding information overload and shiny object syndrome. The challenge is filtering signal from noise—not every new paper or framework matters.",
+
+      action:
+        "Here's my systematic approach to staying current:\n\n**Daily Learning (30-60 minutes/day):**\n\n*Twitter/X Tech Community* (15 min morning): Follow key researchers and practitioners like Andrej Karpathy, Yann LeCun, Andrew Ng, fast.ai community, Hugging Face team. Not just consuming—engaging with threads, asking questions. Helps me catch important developments early.\n\n*Hacker News & Reddit* (15 min): r/MachineLearning for research discussions, r/mlops for production ML practices, HN for industry trends. Filter: Only read highly upvoted posts (500+ votes) to avoid noise.\n\n**Weekly Deep Dives (3-5 hours/week):**\n\n*Reading Papers* (2-3 papers/week): Follow arXiv CS.LG and CS.AI sections. Focus on papers with code (Papers with Code is excellent). Don't read every paper—prioritize based on citation count, author reputation, practical applicability. My approach: Read abstract + intro → Skip to results → Read methods if interesting → Implement key ideas if valuable.\n\n*Engineering Blogs* (1-2 posts/week): Company blogs from OpenAI, Google AI, Meta AI, Anthropic, Hugging Face. Focus on production ML: how companies deploy and scale ML systems.\n\n*YouTube & Podcasts* (2-3 hours/week): Channels like Yannic Kilcher (paper explanations), Two Minute Papers, Lex Fridman. Podcasts: TWIML AI Podcast, Gradient Dissent, Practical AI. Listen during commute or workouts.\n\n**Monthly Hands-On Practice:**\n\n*Build Small Projects*: When new model/technique drops (e.g., Llama 2, Mistral), I build a small project to understand it. Not just tutorials—solve a real problem.\n\n*Weekend Experiments*: Dedicate one weekend per month to trying new tools. Recent examples: Tried Replicate for model hosting, explored Modal for serverless ML, tested different vector databases.\n\n**Community Engagement:**\n\n*Local Meetups*: Attend ML/AI meetups monthly—both learning and networking.\n\n*Online Communities*: Active in Hugging Face Discord, fast.ai forums. Ask questions when stuck, answer questions to reinforce learning.\n\n**Strategic Focus (Avoiding Overload):**\n\nI categorize innovations into three buckets:\n- *Must Learn Now*: Core to my work or clearly game-changing (Transformers, LLMs, RAG)\n- *Watch Closely*: Promising but not yet proven (new optimization techniques)\n- *Aware But Wait*: Interesting but not immediately relevant (quantum ML)\n\nThis prevents FOMO and chasing every new shiny thing.\n\n**Structured Learning:**\n\n*Courses & Books*: One course at a time, finish before moving on. Currently: fast.ai practical deep learning. Reading: Designing Data-Intensive Applications.\n\n*Newsletters*: The Batch (Andrew Ng), Import AI (Jack Clark), TLDR AI. Scan headlines, deep dive on relevant articles.",
+
+      result:
+        "This systematic approach has kept me current while avoiding burnout:\n\n**Tangible Benefits:**\n\n1. *Project Decisions*: When building my sentiment analysis API, I knew about DistilBERT (not just BERT) because I'd read the paper and seen discussions about distillation techniques. This knowledge directly improved my project.\n\n2. *Interview Conversations*: I can discuss recent developments (LLMs, RAG, fine-tuning techniques) intelligently. When interviewers ask 'What excites you about AI?', I have specific, current examples.\n\n3. *Career Pivot*: My continuous learning enabled my transition from traditional software engineering to ML/AI. Built credibility by demonstrating current knowledge.\n\n4. *Consulting Value*: For clients, I can recommend appropriate solutions because I know what's available. When a client needed a chatbot, I suggested OpenAI API with RAG instead of building from scratch—saved months of work.\n\n**Key Insights:**\n- *Quality over Quantity*: Better to deeply understand 2-3 important papers than skim 20\n- *Build to Learn*: Reading about a technique is different from implementing it\n- *Context Matters*: Not every new technique is relevant to every problem\n- *Long-term Fundamentals*: Chase trends tactically, but invest heavily in fundamentals (linear algebra, probability, optimization)—these don't change\n- *Community Accelerates*: Learning with others is faster and more fun than solo\n\nThe AI field moves fast, but with a systematic approach to learning, it's exhilarating rather than overwhelming. I genuinely enjoy staying current—it's one of the reasons I chose this field.",
+    },
+
+    pitfalls: [
+      "Saying you don't keep up or only learn when needed for work",
+      "Listing resources without showing how you actually use them",
+      "Claiming you read every paper or follow everything (unrealistic)",
+      "Not showing genuine passion—just treating it as a chore",
+      "Being vague: 'I read blogs and papers' without specifics",
+      "Not having any recent examples of what you've learned",
+    ],
+
+    tips: [
+      "Be specific about resources: name actual people, blogs, podcasts, papers",
+      "Show your system: daily, weekly, monthly habits",
+      "Demonstrate application: 'I learned X, used it in Y project'",
+      "Mention recent examples: paper you read last week, technique you tried",
+      "Balance breadth and depth: aware of trends, deep in relevant areas",
+      "Show filtering: how you decide what's worth learning deeply",
+      "Express genuine excitement: this should feel like passion, not obligation",
+      "Prepare 2-3 recent things you learned and why they excited you",
+    ],
+
+    followUpQuestions: [
+      "What's the most interesting paper you've read recently?",
+      "What AI development are you most excited about right now?",
+      "How do you decide which new tools/frameworks to invest time learning?",
+      "What's a recent technique you learned and applied to your work?",
+      "Where do you see AI heading in the next 2-3 years?",
+      "Who are the researchers or practitioners you follow most closely?",
+      "What's your take on [recent AI development like GPT-4, Claude, Llama]?",
+    ],
+
+    tags: [
+      "learning",
+      "passion",
+      "continuous-improvement",
+      "staying-current",
+      "high-priority",
+    ],
+  },
+
+  // ============================================================================
+  // QUESTION 18: LLM Experience and Model Selection
+  // ============================================================================
+
+  {
+    id: "technical-08",
+    category: "technical",
+    question: "What LLM models have you used? Why did you choose them?",
+    difficulty: "medium",
+    priority: "critical",
+    estimatedPrepTime: "20-25 minutes",
+
+    whatTheyreLookingFor: [
+      "Hands-on experience with modern LLMs (not just theory)",
+      "Understanding of model tradeoffs (cost, latency, quality)",
+      "Practical decision-making (not just 'GPT-4 is best')",
+      "Awareness of the LLM landscape (OpenAI, Anthropic, open source)",
+      "Production considerations (API vs self-hosted, pricing, rate limits)",
+    ],
+
+    starFramework: {
+      situation: "What LLM-powered applications or experiments have you built?",
+      task: "What were the requirements and constraints?",
+      action:
+        "Which LLMs did you evaluate and why did you choose specific ones?",
+      result: "How did they perform? What did you learn about LLM selection?",
+    },
+
+    exampleAnswer: {
+      situation:
+        "I've worked with several LLMs across different projects and use cases. My experience spans both API-based models (OpenAI, Anthropic) and open-source models (Llama, Mistral). Each project had different requirements, which drove different model choices.",
+
+      task: "I needed to understand the tradeoffs between different LLMs across multiple dimensions: (1) Quality—output accuracy and coherence, (2) Cost—API pricing or hosting costs, (3) Latency—response time for user-facing apps, (4) Context length—how much text they can process, (5) Capabilities—reasoning, coding, function calling, (6) Deployment—API convenience vs self-hosting control.",
+
+      action:
+        "Here's my hands-on experience with different LLMs:\n\n**1. OpenAI GPT Models (Most Experience)**\n\n*GPT-4 Turbo:*\n- Use Case: Client consulting projects requiring highest quality output\n- Example: Built a technical documentation generator. Needed accurate, well-structured content.\n- Why I Chose It: Best-in-class reasoning and instruction following. When quality is paramount and cost is acceptable.\n- Experience: Output quality excellent (rarely hallucinates), Cost expensive ($10/$30 per 1M tokens), Latency ~2-3 seconds, Context 128K tokens\n- Learning: Worth the cost for user-facing applications where quality directly impacts business value.\n\n*GPT-3.5 Turbo:*\n- Use Case: Internal tools, prototyping, cost-sensitive applications\n- Why I Chose It: 10x cheaper than GPT-4, fast, good enough for many tasks\n- Experience: Good for straightforward tasks, struggles with complex reasoning, Very affordable ($1.5/$2 per 1M tokens), Latency ~1 second\n- Learning: Start here for prototypes. Upgrade to GPT-4 only if needed.\n\n**2. Anthropic Claude Models**\n\n*Claude 3.5 Sonnet:*\n- Use Case: Coding assistance and complex analysis\n- Why I Chose It: Competitive with GPT-4, often better at coding, longer context (200K), thoughtful responses\n- Experience: Excellent quality, sometimes more careful and thorough than GPT-4, Very good at code\n- Learning: Claude excels at tasks requiring careful reasoning and code. I now use Claude for coding tasks.\n\n*Claude Haiku:*\n- Use Case: Cost-sensitive, high-volume use cases\n- Why Interesting: Cheapest Anthropic model ($0.25/$1.25 per 1M), very fast, surprisingly capable\n\n**3. Open Source Models (Llama, Mistral)**\n\n*Llama 3 70B:*\n- Use Case: Local deployment and privacy-sensitive applications\n- Why I Chose It: Free to use, can self-host, no data sent to third parties\n- Experience: Approaches GPT-3.5 quality, No per-token pricing but needs GPU, More complex deployment\n- Use Cases: Privacy-sensitive (medical, legal), High-volume with predictable load\n- Learning: Open source is catching up fast. Deployment complexity makes API models easier for most cases.\n\n*Mistral 7B:*\n- Use Case: Experimented for resource-constrained environments\n- Why Interesting: Punches above its weight—7B model rivals much larger models\n- Learning: Small, efficient models perfect for edge deployment.\n\n**4. Model Selection Framework**\n\nMy decision tree:\n- Highest quality needed? → GPT-4 or Claude 3.5 Sonnet\n- Cost-conscious? → GPT-3.5 or Claude Haiku\n- Privacy-critical? → Llama 3 or Mistral (self-host)\n- Prototyping? → Start cheapest (GPT-3.5), upgrade if needed\n\n**5. Production Learnings**\n\n*Cost Optimization:*\n- Implemented caching for repeated queries (95% hit rate)\n- Used GPT-3.5 for initial classification, GPT-4 only for complex cases (saved 60%)\n- Prompt engineering to reduce output tokens\n\n*Latency Optimization:*\n- Streaming responses for better UX\n- Parallel API calls when appropriate\n- Batch processing for non-real-time tasks\n\n*API Best Practices:*\n- Proper error handling (rate limits, timeouts)\n- Exponential backoff for retries\n- Set max_tokens to control costs\n- Monitor token usage to prevent bill shock",
+
+      result:
+        "Through hands-on experience with multiple LLMs, I've learned that model selection is highly context-dependent:\n\n**Key Insights:**\n\n1. *No 'Best' Model—Only Best for Use Case:*\n   - GPT-4: Best for quality-critical, user-facing applications\n   - GPT-3.5: Best for cost-sensitive, simple tasks\n   - Claude: Best for coding and careful reasoning\n   - Llama/Mistral: Best for privacy or high-volume with predictable load\n\n2. *Cost-Quality Tradeoff is Real:*\n   - Saved 50-70% by using GPT-3.5 for simple tasks, GPT-4 only when needed\n   - Prompt engineering can improve GPT-3.5 to near GPT-4 quality for specific tasks\n\n3. *Deployment Matters:*\n   - API models: Easy to start, pay-per-use, but vendor lock-in and data privacy concerns\n   - Self-hosted: More control, better privacy, cheaper at scale, but complex deployment\n\n4. *Context Length is Underrated:*\n   - GPT-4's 128K and Claude's 200K are game-changers for document analysis and RAG\n   - Eliminates need for complex chunking strategies\n\n5. *The Landscape Evolves Rapidly:*\n   - 6 months ago: GPT-4 was clearly best\n   - Now: Claude 3.5 matches or exceeds GPT-4 on many tasks, Llama 3 rivals GPT-3.5\n   - Future: Model selection will get more nuanced as specialized models emerge\n\n**Current Focus:**\n- Learning to fine-tune smaller models for specific tasks\n- Building RAG systems that work well with different LLMs\n- Staying current as new models launch\n\nMost importantly: be pragmatic. Start with the cheapest model that might work, iterate, upgrade only if needed.",
+    },
+
+    pitfalls: [
+      "Saying you've only used ChatGPT (shows limited hands-on experience)",
+      "Claiming you've used models you actually haven't (interviewers will dig deeper)",
+      "Not explaining why you chose specific models (just listing names)",
+      "Only knowing OpenAI models (shows limited awareness of the landscape)",
+      "Not mentioning cost, latency, or practical constraints",
+      "Saying 'GPT-4 is always the best' without nuance",
+      "Not having any specific examples or projects to reference",
+    ],
+
+    tips: [
+      "Be honest about which models you've actually used hands-on",
+      "Explain the use case for each model choice",
+      "Show awareness of tradeoffs: quality vs cost vs latency vs control",
+      "Mention at least one open-source model (shows broad awareness)",
+      "Include specific numbers: cost per 1M tokens, context length, latency",
+      "Demonstrate practical experience: caching, error handling, monitoring",
+      "Show you stay current: mention recent models (Claude 3.5, Llama 3, Gemini)",
+      "Connect to real projects: 'In my X project, I used Y because Z'",
+      "Prepare 2-3 specific examples of model selection decisions",
+    ],
+
+    followUpQuestions: [
+      "How do you handle LLM hallucinations in production?",
+      "Have you fine-tuned any LLMs? Why or why not?",
+      "How do you evaluate LLM output quality?",
+      "What's your experience with prompt engineering?",
+      "Have you built RAG systems? Which LLM did you use?",
+      "How do you manage LLM API costs in production?",
+      "What's your take on open-source vs commercial LLMs?",
+      "How do you handle rate limits and API failures?",
+      "Have you used LLMs with function calling or tool use?",
+      "What's the most challenging LLM integration you've done?",
+    ],
+
+    tags: [
+      "llm",
+      "model-selection",
+      "openai",
+      "claude",
+      "llama",
+      "critical",
+      "modern-ai",
+    ],
+  },
+
+  // ============================================================================
+  // QUESTION 19: Vector Database & RAG Experience
+  // ============================================================================
+
+  {
+    id: "technical-09",
+    category: "technical",
+    question:
+      "What vector database have you used in RAG systems? How did you use it?",
+    difficulty: "hard",
+    priority: "critical",
+    estimatedPrepTime: "25-30 minutes",
+
+    whatTheyreLookingFor: [
+      "Hands-on experience with RAG architecture (not just theory)",
+      "Understanding of vector databases and semantic search",
+      "Practical knowledge of embeddings and similarity search",
+      "Awareness of the vector DB landscape (Pinecone, Weaviate, Chroma, etc.)",
+      "Production considerations (scale, latency, cost, accuracy)",
+    ],
+
+    starFramework: {
+      situation:
+        "What RAG application did you build? What problem were you solving?",
+      task: "Why did you need RAG? What were the requirements?",
+      action:
+        "Which vector DB did you choose and why? How did you implement it?",
+      result: "How did it perform? What challenges did you face and overcome?",
+    },
+
+    exampleAnswer: {
+      situation:
+        "I've built RAG systems for two different use cases, using different vector databases for each. First, for a consulting client, I built a customer support chatbot that needed to answer questions based on their internal documentation (500+ pages of PDFs, markdown files, and wiki articles). Second, I've been experimenting with a personal knowledge base system to learn RAG architecture hands-on.",
+
+      task: "Both projects needed RAG (Retrieval-Augmented Generation) instead of pure LLM because: (1) The information wasn't in the LLM's training data (company-specific docs, personal notes), (2) Information changes frequently (documentation updates weekly), (3) Need to cite sources (show users where answers come from), (4) Reduce hallucinations (ground responses in actual documents). The requirements differed: client project needed production reliability and scale (1000+ users), while personal project prioritized learning and experimentation.",
+
+      action:
+        "Here's my hands-on experience with different vector databases:\n\n**1. Pinecone (Client Production Project)**\n\n*Why I Chose Pinecone:*\n- Managed Service: No infrastructure management—critical for small team\n- Production-Ready: Built for scale, with monitoring and backups\n- Performance: Sub-100ms query latency even with millions of vectors\n- Ease of Use: Excellent Python SDK, good documentation\n\n*Architecture:*\nUser Query → Embed with text-embedding-3-small → Query Pinecone (cosine similarity, top_k=5) → Retrieve relevant chunks → Construct prompt with context → Send to GPT-4 → Return answer + citations\n\n*Implementation Details:*\n\n**Document Processing Pipeline:**\n1. Chunk Documents: Split PDFs and markdown into 500-token chunks with 50-token overlap. Why 500 tokens? Fits in LLM context while maintaining coherence. Why overlap? Prevents semantic information from being cut off at boundaries.\n\n2. Generate Embeddings: Used OpenAI text-embedding-3-small (1536 dimensions). Cost: $0.02 per 1M tokens. Quality: Good enough for most use cases.\n\n3. Store in Pinecone with metadata: source, page, date for filtering and citations.\n\n*Performance Results:*\n- Query Latency: 80-120ms for vector search + 2-3s for LLM response\n- Accuracy: 92% of questions answered correctly (measured by user feedback)\n- Cost: ~$0.05 per query (embedding + search + GPT-4)\n- Scale: Handling 1000+ daily queries, 50K+ document chunks\n\n*Challenges & Solutions:*\n\n**Challenge 1: Chunking Strategy**\nProblem: Fixed 500-token chunks sometimes split semantic units (e.g., a table split in half). Solution: Implemented semantic chunking—split on paragraphs, headings, and natural boundaries. Result: 15% improvement in retrieval relevance.\n\n**Challenge 2: Irrelevant Results**\nProblem: Sometimes top-5 results weren't relevant to query. Solution: Added similarity threshold (only use results with score > 0.7). Result: Reduced hallucinations by prompting LLM to say 'I don't have that information' when context is weak.\n\n**Challenge 3: Outdated Information**\nProblem: Documentation updates weekly, need to keep vector DB current. Solution: Built update pipeline—detect changed docs, re-embed, upsert to Pinecone. Result: Automated updates run nightly.\n\n**Pinecone Learnings:**\n- Pros: Zero maintenance, great performance, reliable, excellent DX\n- Cons: Cost at scale ($70/month for 100K vectors), vendor lock-in\n- Best for: Production apps where reliability > cost, teams without ML infrastructure\n\n**2. Chroma (Personal Experiments)**\n\n*Why I Chose Chroma for Experiments:*\n- Free & Open Source: No costs for learning/prototyping\n- Local First: Runs entirely on my laptop, no API keys needed\n- Simple: Minimal setup, great for quick iterations\n- Python-Native: Feels like using a regular Python library\n\n*Chroma Learnings:*\n- Pros: Easy setup, no cost, good for local development\n- Cons: Not for production scale, performance degrades >100K docs\n- Best for: Prototyping, learning, personal projects\n\n**3. Vector Database Comparison (Evaluated)**\n\n- Weaviate: Open source, built-in hybrid search (vector + keyword). Good for teams wanting control.\n- Milvus: Open source, highly scalable. Built for billion-scale vector search.\n- Qdrant: Open source, Rust-based (very fast). Excellent filtering capabilities.\n- pgvector: Extension to existing Postgres. Good for existing Postgres users.\n- FAISS: Library, not database. Extremely fast for similarity search in research.\n\n**4. RAG Architecture Best Practices**\n\n*Embedding Model Selection:*\nSwitched from text-embedding-ada-002 to text-embedding-3-small—better quality, cheaper, same dimensions.\n\n*Chunking Strategy:*\nSemantic chunking > fixed-size. Always include 10-20% overlap.\n\n*Metadata is Critical:*\nStore source, page, date. Enables filtering and citations.\n\n*Retrieval Strategies:*\nTop-k + threshold + MMR (Maximal Marginal Relevance) for diverse results.\n\n*Prompt Engineering for RAG:*\nStructured prompt with rules: only use context, cite sources, say 'I don't know' if not in context. Reduced hallucinations by 40%.",
+
+      result:
+        "Through building these RAG systems, I've learned that RAG is not just 'embed docs and search'—it's a complete system with many design decisions:\n\n**Key Insights:**\n\n1. *Vector DB Choice is Context-Dependent:*\n   - Production + Small Team → Pinecone (managed, reliable)\n   - Prototyping/Learning → Chroma (free, local)\n   - Large Scale + ML Team → Weaviate/Milvus (self-hosted)\n   - Already on Postgres → pgvector (minimize new infrastructure)\n\n2. *Chunking Strategy Matters More Than Expected:*\n   - Bad chunking = irrelevant retrievals no matter how good your vector DB\n   - Spent 30% of time iterating on chunking strategy\n   - Semantic chunking + overlap improved accuracy by 15%\n\n3. *RAG is a System, Not Just Vector Search:*\n   - Document processing pipeline\n   - Embedding generation and versioning\n   - Vector storage and indexing\n   - Retrieval and ranking\n   - Context construction\n   - LLM prompting\n   - Citation generation\n   - Each part has failure modes that need handling\n\n4. *Cost Optimization is Critical:*\n   - Pinecone: $70/month for 100K vectors\n   - Embeddings: $0.02 per 1M tokens (cheap)\n   - LLM calls: $0.05 per query with GPT-4 (expensive)\n   - Optimization: Cache frequently asked questions, use GPT-3.5 when possible\n\n5. *Retrieval Quality > LLM Quality:*\n   - If retrieval returns irrelevant context, even GPT-4 will give bad answers\n   - Better to improve chunking and retrieval than upgrade LLM\n\n6. *Hybrid Search is Underrated:*\n   - Pure vector search misses exact keyword matches\n   - Combining vector + keyword matching improved results by 10%\n\n**Production Readiness Checklist I Now Use:**\n- Document processing pipeline with error handling\n- Embedding versioning (track which embedding model)\n- Incremental updates (don't re-embed entire corpus)\n- Similarity score thresholds tuned on validation set\n- Citation generation working correctly\n- Fallback when no relevant context found\n- Monitoring and alerting in place\n- Cost per query measured and acceptable\n\nRAG is now the standard approach for LLM applications with private/recent data. Understanding the full stack is essential for building production systems.",
+    },
+
+    pitfalls: [
+      "Saying you haven't used vector databases (big red flag in 2024)",
+      "Only knowing the name without understanding how they work",
+      "Not explaining the RAG architecture end-to-end",
+      "Claiming you used vector DB without mentioning embeddings",
+      "Not discussing tradeoffs between different vector databases",
+      "Forgetting to mention chunking strategy (critical part)",
+      "Not talking about challenges and how you solved them",
+      "Being vague: 'I used Pinecone for RAG' without details",
+    ],
+
+    tips: [
+      "Be specific about which vector DB you used and why",
+      "Explain the complete RAG pipeline, not just vector search",
+      "Mention embeddings model (text-embedding-3-small, Sentence Transformers)",
+      "Discuss chunking strategy and why it matters",
+      "Show awareness of multiple vector DBs and their tradeoffs",
+      "Include concrete numbers: latency, cost, accuracy, scale",
+      "Talk about challenges: relevance, chunking, cost, latency",
+      "Show you understand RAG is a system, not just one component",
+      "If limited experience, be honest but show you understand the architecture",
+      "Prepare a diagram in your mind: Query → Embed → Search → Retrieve → Prompt → Answer",
+    ],
+
+    followUpQuestions: [
+      "How did you choose your chunking strategy?",
+      "What embedding model did you use and why?",
+      "How do you handle documents that are too large for context window?",
+      "How do you prevent hallucinations in RAG systems?",
+      "What's your approach to keeping the vector database up to date?",
+      "How do you evaluate RAG system quality?",
+      "Have you tried hybrid search (vector + keyword)?",
+      "What's the difference between semantic search and keyword search?",
+      "How do you handle multi-hop reasoning in RAG?",
+      "What are the cost implications of RAG at scale?",
+    ],
+
+    tags: [
+      "rag",
+      "vector-database",
+      "embeddings",
+      "pinecone",
+      "chroma",
+      "semantic-search",
+      "critical",
+      "modern-ai",
+    ],
+  },
 ];
 
 // ============================================================================

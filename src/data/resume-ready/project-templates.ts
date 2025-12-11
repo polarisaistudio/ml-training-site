@@ -1354,6 +1354,27 @@ You now have a production ML application running in the cloud! Share the URL wit
           "Industry insight: production ML is mostly engineering",
         ],
       },
+      {
+        id: "q7-model-selection",
+        question:
+          "How did you evaluate and choose DistilBERT for this project? Why not use BERT or a larger model?",
+        starAnswer: {
+          situation:
+            "When starting this sentiment analysis project, I needed to choose a transformer model. I knew BERT was the gold standard for NLP, but I also needed the API to be fast enough for real-time use. I couldn't just pick the most accurate model—I had to evaluate systematically.",
+          task: "My evaluation criteria were: (1) Model Quality - accuracy on sentiment classification, (2) Inference Latency - response time for real-time API (<200ms target), (3) Resource Efficiency - model size and memory footprint, (4) Ease of Use - compatibility with existing tools like HuggingFace transformers.",
+          action:
+            "I compared four approaches: Logistic Regression + TF-IDF (82% accuracy, <50ms, 5MB - too simple, misses nuance), BERT-base (92% accuracy, 800-1200ms, 440MB - gold standard but too slow), DistilBERT (89% accuracy, 400-600ms, 260MB - best balance), and RoBERTa (93% accuracy, 1000-1500ms, 500MB - highest accuracy but slowest). My evaluation process included: (1) Offline evaluation on SST-2 dataset measuring accuracy, precision, recall, F1 - DistilBERT achieved 89% vs BERT's 92%, only 3% drop; (2) Online evaluation deploying each model and measuring real-world latency with 50 concurrent requests - BERT was 800-1200ms (unacceptable), DistilBERT was 400-600ms (borderline acceptable); (3) After choosing DistilBERT, I optimized further with LRU caching (95%+ hit rate) and batch processing, getting final latency to <200ms.",
+          result:
+            "DistilBERT was the right choice for this use case. The 3% accuracy drop from BERT (92%) to DistilBERT (89%) was acceptable for 60% faster inference and 40% smaller model size. Final system achieved: 89% accuracy (good enough for production), <200ms average response time (excellent UX), handles 50+ concurrent users, deployed and running reliably. Key insight: the 'best' model depends on use case - for this real-time API, DistilBERT won; for batch processing overnight, I'd use RoBERTa for extra accuracy since latency doesn't matter.",
+        },
+        keyPoints: [
+          "Systematic model comparison with specific metrics",
+          "Understanding accuracy vs latency tradeoffs",
+          "Data-driven decision making with benchmarks",
+          "Context-dependent optimization - best model depends on use case",
+          "Quantifiable results: accuracy percentages, latency numbers, model sizes",
+        ],
+      },
     ],
   },
 };
