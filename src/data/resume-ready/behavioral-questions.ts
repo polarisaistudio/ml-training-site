@@ -270,8 +270,7 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
       situation:
         "What technology did you need to learn? Why was speed important?",
       task: "What goal did you need to achieve with this new technology?",
-      action:
-        "Describe your learning process: resources, practice, validation",
+      action: "Describe your learning process: resources, practice, validation",
       result: "How quickly did you learn it? How well could you apply it?",
     },
 
@@ -332,8 +331,7 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
     ],
 
     starFramework: {
-      situation:
-        "What happened? What was the mistake? Be honest and specific.",
+      situation: "What happened? What was the mistake? Be honest and specific.",
       task: "Why did this failure matter? What needed to be fixed?",
       action:
         "How did you respond? Fix it? Communicate it? Prevent recurrence?",
@@ -344,7 +342,7 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
       situation:
         "In an early version of my sentiment analysis API, I was eager to share it publicly, so I deployed to Railway and posted the URL on social media. Within a few hours, the server crashed. I hadn't done any load testing and was using Flask's development server, which isn't designed for concurrent requests. Under even moderate traffic, it completely failed.",
 
-      task: 'I needed to fix the immediate problem (get the service back up), communicate honestly about what happened, and ensure it wouldn\'t happen again. This was embarrassing because I had promoted it as "production-ready" when it clearly wasn\'t.',
+      task: "I needed to fix the immediate problem (get the service back up), communicate honestly about what happened, and ensure it wouldn't happen again. This was embarrassing because I had promoted it as \"production-ready\" when it clearly wasn't.",
 
       action:
         "I took immediate action: First, I took the server offline completely to prevent further issues and user frustration. Second, I sent a message to everyone who had the URL: \"I deployed prematurely without proper load testing. The service is down while I fix production readiness issues. I'll have it back up within 24 hours.\" No excuses, just facts. Third, I did proper research on production deployment—this is when I learned about Gunicorn, worker processes, and production WSGI servers. Fourth, I set up a comprehensive test suite including load testing with 50+ concurrent requests using Python's requests library. Fifth, I implemented proper monitoring, health checks, and logging. Finally, I created a deployment checklist: load testing ✓, production server ✓, monitoring ✓, rate limiting ✓, proper error handling ✓. I wouldn't deploy without checking every item.",
@@ -375,7 +373,13 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
       "Tell me about another time you failed",
     ],
 
-    tags: ["failure", "accountability", "learning", "must-prepare", "production"],
+    tags: [
+      "failure",
+      "accountability",
+      "learning",
+      "must-prepare",
+      "production",
+    ],
   },
 
   // ============================================================================
@@ -409,7 +413,7 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
 
     exampleAnswer: {
       situation:
-        "While demonstrating my sentiment analysis project to a friend who works in customer service (non-technical), she asked why the system sometimes shows different confidence scores for similar-sounding feedback, and why we can't just say \"positive\" or \"negative\" without the percentage.",
+        'While demonstrating my sentiment analysis project to a friend who works in customer service (non-technical), she asked why the system sometimes shows different confidence scores for similar-sounding feedback, and why we can\'t just say "positive" or "negative" without the percentage.',
 
       task: "I needed to explain that ML models work with probability, not certainty, and that confidence scores are actually crucial for making good business decisions—especially when handling customer feedback. She needed to understand this wasn't a bug, but a feature that makes the system more useful.",
 
@@ -417,7 +421,7 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
         "I used an analogy from her domain: \"Think about reading customer emails. When someone writes 'Thanks', you're not 100% certain if they're being sarcastic or genuine, right? You might be 60% confident it's positive based on context. But when they write 'Thank you so much, this solved my problem!', you're 95% confident it's genuine appreciation. The AI works exactly the same way—it gives you its confidence level.\" Then I showed concrete examples from the interface: high-confidence predictions we can trust immediately, and low-confidence ones where a human should review. I connected it directly to her work: \"In customer service, you'd want to prioritize the clearly angry customers—high-confidence negative feedback—and route them to senior support immediately. The uncertain ones could be flagged for manager review. This confidence score helps you triage effectively.\" I asked her to explain it back to make sure she got it.",
 
       result:
-        "She immediately understood and even suggested a great use case: \"So we could auto-route very angry customers—high confidence negative—to senior agents, and flag low-confidence feedback for quality review?\" Exactly. This conversation taught me that non-technical people aren't \"non-technical\" in their domain—they just need the right framing. She understood probability and confidence intuitively from her work; I just needed to connect my technical concept to her existing mental models. Now I always start with \"what does this enable you to do?\" rather than \"how does this work?\" When explaining to business stakeholders, I lead with value and use domain-specific analogies.",
+        'She immediately understood and even suggested a great use case: "So we could auto-route very angry customers—high confidence negative—to senior agents, and flag low-confidence feedback for quality review?" Exactly. This conversation taught me that non-technical people aren\'t "non-technical" in their domain—they just need the right framing. She understood probability and confidence intuitively from her work; I just needed to connect my technical concept to her existing mental models. Now I always start with "what does this enable you to do?" rather than "how does this work?" When explaining to business stakeholders, I lead with value and use domain-specific analogies.',
     },
 
     pitfalls: [
@@ -624,7 +628,7 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
       "Be specific about what excites you (the intersection of X and Y)",
       "Show you've done projects to validate your interest",
       "Connect your past experience to why ML makes sense for you",
-      "Tailor the \"long-term goals\" part to the company's domain",
+      'Tailor the "long-term goals" part to the company\'s domain',
       "Be genuine—passion comes through in how you talk about it",
     ],
 
@@ -658,8 +662,7 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
     ],
 
     starFramework: {
-      situation:
-        "What you know about the company and why it stands out to you",
+      situation: "What you know about the company and why it stands out to you",
       task: "What specifically attracts you to this role and team",
       action: "How your background and skills align with their needs",
       result: "What you hope to contribute and learn",
@@ -701,7 +704,230 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
       "Do you have any questions for us?",
     ],
 
-    tags: ["motivation", "company-fit", "must-prepare", "customize-per-company"],
+    tags: [
+      "motivation",
+      "company-fit",
+      "must-prepare",
+      "customize-per-company",
+    ],
+  },
+
+  // ============================================================================
+  // QUESTION 11: Interview Process Stage
+  // ============================================================================
+
+  {
+    id: "screening-01",
+    category: "general",
+    question:
+      "What stage are you at in your interview process with other companies?",
+    difficulty: "easy",
+    priority: "high",
+    estimatedPrepTime: "10-15 minutes",
+
+    whatTheyreLookingFor: [
+      "Honesty and transparency",
+      "Your desirability as a candidate (other companies interested)",
+      "Timeline and urgency",
+      "Whether they need to move quickly to secure you",
+    ],
+
+    starFramework: {
+      situation: "Your current interview status across companies",
+      task: "Balance honesty with strategy—show you're in demand but not dismissive",
+      action: "Share high-level status without too many details",
+      result: "Create appropriate urgency without pressure",
+    },
+
+    exampleAnswer: {
+      situation:
+        "I'm actively interviewing and exploring opportunities in the ML/AI space. I'm taking a thoughtful approach to find the right fit rather than rushing into any decision.",
+
+      task: "I want to be transparent while also showing that I'm a sought-after candidate, which should motivate the company to move forward if they're interested.",
+
+      action:
+        "I'm currently in conversations with a few companies—some are at the initial phone screen stage, and I have a couple that are moving toward final rounds. I'm at different stages with each, but I'm most excited about roles where I can work on production ML systems with experienced teams, which is why your company particularly interests me. I'm not rushing to accept the first offer—I'm evaluating based on fit, not just timeline.",
+
+      result:
+        "This gives them a realistic picture: I'm interviewing actively (creates some urgency), but I'm being selective (shows I won't just jump at any offer), and I'm genuinely interested in them (not just using them for leverage). If they're interested, they know they should keep the process moving.",
+    },
+
+    pitfalls: [
+      "Lying about other interviews—they might ask for details",
+      'Saying "you\'re my only interview" (looks desperate)',
+      "Naming specific companies you're interviewing with (unprofessional)",
+      'Creating fake urgency: "I have an offer due tomorrow" when you don\'t',
+      'Being too vague: "I\'m talking to some companies" without any substance',
+    ],
+
+    tips: [
+      "Be honest but strategic—you don't owe them every detail",
+      'Frame it positively: "exploring opportunities" not "desperate for a job"',
+      'If you have no other interviews: "I\'m early in my search and being selective"',
+      'If you have many: "I\'m in active conversations with several companies"',
+      'Don\'t name companies unless they press, then say "a couple tech companies in the ML space"',
+      "Always end with why you're excited about THEIR role specifically",
+    ],
+
+    followUpQuestions: [
+      "When are you looking to make a decision?",
+      "Are you interviewing for similar roles elsewhere?",
+      "Do you have any offers currently?",
+      "What's your timeline for starting a new role?",
+    ],
+
+    tags: ["screening", "recruiting", "negotiation", "early-stage"],
+  },
+
+  // ============================================================================
+  // QUESTION 12: Why Looking for New Opportunities
+  // ============================================================================
+
+  {
+    id: "screening-02",
+    category: "general",
+    question:
+      "Why are you looking for new opportunities? Why leave your current role?",
+    difficulty: "medium",
+    priority: "critical",
+    estimatedPrepTime: "15-20 minutes",
+
+    whatTheyreLookingFor: [
+      "Are you running away from problems or running toward growth?",
+      "How do you talk about previous employers (red flag if negative)",
+      "Whether your reasons align with what they offer",
+      "Your professionalism and maturity",
+    ],
+
+    starFramework: {
+      situation: "Your current situation without being negative",
+      task: "Explain your motivation for change positively",
+      action: "Connect your reasons to what this new role offers",
+      result: "Show this move is strategic, not reactive",
+    },
+
+    exampleAnswer: {
+      situation:
+        "I've been running Polaris AI Studio, an AI consulting business, for the past year, and it's been incredibly valuable for building practical ML skills and understanding business needs. I've helped several local businesses implement AI solutions and built my own projects like the sentiment analysis API.",
+
+      task: "While I love the entrepreneurial aspect and the breadth of problems I get to solve, I've realized that I want to go deeper into ML engineering in a team environment. Working solo means I'm learning everything on my own, but I'm missing out on learning from experienced ML engineers, working on problems at scale, and contributing to larger ML systems that impact millions of users.",
+
+      action:
+        "I'm specifically looking for a role where I can: (1) Work on a dedicated ML team and learn from senior engineers—there's so much I can learn from people who've built production ML systems at scale. (2) Focus deeply on ML problems rather than juggling business development, sales, and technical work. (3) Work on ML systems that serve many users, not just small business implementations. That's exactly what attracted me to this role—the opportunity to work on [specific aspect from job description] with an experienced team.",
+
+      result:
+        'This move isn\'t about running away from problems—Polaris AI Studio is going well. It\'s about strategic career growth. I want to transition from "solo practitioner learning ML" to "ML engineer on a strong team shipping production systems." This role represents that next step in my career trajectory.',
+    },
+
+    pitfalls: [
+      "Badmouthing your current/previous employer (huge red flag)",
+      "Only talking about what you want, not what you'll contribute",
+      'Being vague: "I want a change" without explaining why',
+      "Saying you're leaving because of money (even if true, frame it better)",
+      "Contradicting your resume or past statements",
+      "Making it sound like you're desperate or being forced out",
+    ],
+
+    tips: [
+      'Frame it as "running toward" opportunities, not "running away from" problems',
+      "Be honest but diplomatic about current role limitations",
+      "Connect your reasons to what THIS company offers specifically",
+      "Show you've thought strategically about your career path",
+      "If you were laid off or fired: be honest, brief, and forward-looking",
+      'If leaving for money: frame as "seeking fair market compensation for my growing skills"',
+      "Practice this answer—it's asked in almost every interview",
+    ],
+
+    followUpQuestions: [
+      "What did you like about your current role?",
+      "Have you talked to your current manager about these concerns?",
+      "When would you be able to start?",
+      "Are you willing to relocate?",
+    ],
+
+    tags: [
+      "screening",
+      "motivation",
+      "career-goals",
+      "must-prepare",
+      "critical",
+    ],
+  },
+
+  // ============================================================================
+  // QUESTION 13: What You're Looking For
+  // ============================================================================
+
+  {
+    id: "screening-03",
+    category: "general",
+    question:
+      "What are you looking for in your next opportunity? What's important to you?",
+    difficulty: "medium",
+    priority: "critical",
+    estimatedPrepTime: "15-20 minutes",
+
+    whatTheyreLookingFor: [
+      "Whether your priorities align with what they can offer",
+      "How thoughtful you are about your career",
+      "If you've researched their company (do your needs match their strengths)",
+      "Red flags: only care about money, unrealistic expectations",
+    ],
+
+    starFramework: {
+      situation: "Your career stage and what you've learned about yourself",
+      task: "Articulate clear priorities that are authentic and realistic",
+      action: "Explain 3-4 key factors and why they matter",
+      result: "Show how this role aligns with those factors",
+    },
+
+    exampleAnswer: {
+      situation:
+        "After working in software engineering for 10+ years and recently transitioning into ML through my consulting work, I have a clear sense of what environment helps me do my best work and grow.",
+
+      task: "I'm looking for a role that satisfies a few key criteria, which I've prioritized based on my career goals and what I know about how I work best.",
+
+      action:
+        "First and most importantly, I want to work with experienced ML engineers. I've been learning ML somewhat independently, and while building projects like my sentiment analysis API has been valuable, I know I'll learn exponentially faster from a strong team. I'm looking for mentorship and the opportunity to learn production ML best practices from people who've done it at scale.\n\nSecond, I want to work on production ML systems that real users depend on. I'm past the \"academic project\" phase—I want to see the impact of my work and deal with real-world challenges like model monitoring, performance optimization, and handling edge cases. The technical challenges of production ML are what excite me.\n\nThird, I value a collaborative team culture. I've worked in both siloed and collaborative environments, and I'm definitely more productive when I can discuss problems, pair program, and learn from others. A culture of knowledge sharing is important to me.\n\nFinally, I'm looking for growth opportunities. I want to be in a role where I can grow from an ML engineer who's still learning, to someone who can architect and lead ML systems. I'm not looking to stagnate—I want to be challenged.\n\nWhat attracted me to this role specifically is that it seems to check all these boxes: [mention specific aspects from job description, team size, tech stack, products, culture indicators]. That alignment is why I'm excited about this conversation.",
+
+      result:
+        "This shows I've thought carefully about what I need to thrive, my priorities are realistic and achievable, and I've done my homework on why this role fits. It opens up a conversation about whether we're a mutual fit.",
+    },
+
+    pitfalls: [
+      "Only mentioning compensation and benefits (looks mercenary)",
+      'Being too vague: "good culture" or "interesting work" without specifics',
+      'Listing unrealistic expectations: "fully remote, unlimited vacation, 200k+ salary for entry-level"',
+      "Not connecting your needs to what they offer (shows you didn't research)",
+      "Focusing only on what you want without mentioning what you'll contribute",
+      "Contradicting yourself: saying you want mentorship but asking about senior IC role",
+    ],
+
+    tips: [
+      "Prepare 3-4 priorities and explain WHY each matters to you",
+      'Make it personal: "I\'ve learned I work best when..." not generic',
+      'Show you\'ve researched: "I saw on your blog that..." or "I noticed your team..."',
+      'Balance learning and contributing: not just "what can you do for me"',
+      "Be authentic—they can tell if you're just saying what they want to hear",
+      'It\'s okay to mention compensation, but frame it properly: "fair market compensation" not "I want $X"',
+      "Tailor this answer to each company based on what they offer",
+    ],
+
+    followUpQuestions: [
+      "What would make you choose one offer over another?",
+      "What are your deal-breakers?",
+      "Where do you want to be in 3-5 years?",
+      "What's your ideal team size?",
+      "How important is remote work to you?",
+    ],
+
+    tags: [
+      "screening",
+      "motivation",
+      "culture-fit",
+      "must-prepare",
+      "critical",
+    ],
   },
 ];
 
@@ -710,13 +936,13 @@ export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
 // ============================================================================
 
 export const getQuestionsByPriority = (
-  priority: QuestionPriority
+  priority: QuestionPriority,
 ): BehavioralQuestion[] => {
   return BEHAVIORAL_QUESTIONS.filter((q) => q.priority === priority);
 };
 
 export const getQuestionsByCategory = (
-  category: QuestionCategory
+  category: QuestionCategory,
 ): BehavioralQuestion[] => {
   return BEHAVIORAL_QUESTIONS.filter((q) => q.category === category);
 };

@@ -3,6 +3,8 @@ import { db, stages, contentItems, questions } from "@/db";
 import { sql, count, eq } from "drizzle-orm";
 import { StageCard } from "@/components/StageCard";
 import { EmailSubscription } from "@/components/EmailSubscription";
+import { BEHAVIORAL_QUESTIONS } from "@/data/resume-ready/behavioral-questions";
+import { PROJECT_TEMPLATES } from "@/data/resume-ready/project-templates";
 
 async function getStagesWithCounts() {
   const stagesData = await db.select().from(stages).orderBy(stages.order);
@@ -23,11 +25,25 @@ async function getStagesWithCounts() {
     ]),
   );
 
-  return stagesData.map((stage) => ({
-    ...stage,
-    totalCount: countsMap.get(stage.id)?.total ?? 0,
-    availableCount: countsMap.get(stage.id)?.available ?? 0,
-  }));
+  // Calculate Resume Ready content count from static files
+  const resumeReadyItemCount =
+    BEHAVIORAL_QUESTIONS.length + Object.keys(PROJECT_TEMPLATES).length;
+
+  return stagesData.map((stage) => {
+    // Special handling for Resume Ready stage - content is in static files, not DB
+    if (stage.slug === "resume-ready") {
+      return {
+        ...stage,
+        totalCount: resumeReadyItemCount,
+        availableCount: resumeReadyItemCount,
+      };
+    }
+    return {
+      ...stage,
+      totalCount: countsMap.get(stage.id)?.total ?? 0,
+      availableCount: countsMap.get(stage.id)?.available ?? 0,
+    };
+  });
 }
 
 async function getRealInterviewCount() {
