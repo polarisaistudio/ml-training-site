@@ -1,50 +1,9 @@
 import Link from "next/link";
-import { db, stages, contentItems, questions } from "@/db";
-import { sql, count, eq } from "drizzle-orm";
-import { StageCard } from "@/components/StageCard";
-import { EmailSubscription } from "@/components/EmailSubscription";
+import { db, questions } from "@/db";
+import { count, eq } from "drizzle-orm";
 import { BEHAVIORAL_QUESTIONS } from "@/data/resume-ready/behavioral-questions";
 import { PROJECT_TEMPLATES } from "@/data/resume-ready/project-templates";
-
-async function getStagesWithCounts() {
-  const stagesData = await db.select().from(stages).orderBy(stages.order);
-
-  const countsData = await db
-    .select({
-      stageId: contentItems.stageId,
-      total: count(),
-      available: sql<number>`count(*) filter (where ${contentItems.isAvailable} = true)`,
-    })
-    .from(contentItems)
-    .groupBy(contentItems.stageId);
-
-  const countsMap = new Map(
-    countsData.map((c) => [
-      c.stageId,
-      { total: Number(c.total), available: Number(c.available) },
-    ]),
-  );
-
-  // Calculate Resume Ready content count from static files
-  const resumeReadyItemCount =
-    BEHAVIORAL_QUESTIONS.length + Object.keys(PROJECT_TEMPLATES).length;
-
-  return stagesData.map((stage) => {
-    // Special handling for Resume Ready stage - content is in static files, not DB
-    if (stage.slug === "resume-ready") {
-      return {
-        ...stage,
-        totalCount: resumeReadyItemCount,
-        availableCount: resumeReadyItemCount,
-      };
-    }
-    return {
-      ...stage,
-      totalCount: countsMap.get(stage.id)?.total ?? 0,
-      availableCount: countsMap.get(stage.id)?.available ?? 0,
-    };
-  });
-}
+import { demoProgress } from "@/types/progress";
 
 async function getRealInterviewCount() {
   const result = await db
@@ -55,199 +14,378 @@ async function getRealInterviewCount() {
 }
 
 export default async function HomePage() {
-  const [stagesWithCounts, realInterviewCount] = await Promise.all([
-    getStagesWithCounts(),
-    getRealInterviewCount(),
-  ]);
+  const realInterviewCount = await getRealInterviewCount();
+
+  // Using demo progress for now - will be replaced with actual user progress
+  const userProgress = demoProgress;
+
+  // Get counts from data files
+  const projectCount = Object.keys(PROJECT_TEMPLATES).length;
+  const bqCount = BEHAVIORAL_QUESTIONS.length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Hero Section */}
-      <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-          The Real Interview Guide for Engineers
-          <br />
-          <span className="text-blue-600">Transitioning to ML/AI Roles</span>
-        </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-          Real interview questions + 13-week structured learning path to
-          systematically prepare for ML/AI interviews
-        </p>
-
-        {/* Value Propositions */}
-        <div className="flex flex-col md:flex-row justify-center gap-6 mb-10 text-left max-w-3xl mx-auto">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">🎯</span>
-            <p className="text-gray-700">
-              Questions from actual interviews, not scraped from the internet
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Your Path to ML Engineering Offers
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Choose your learning style: Follow the guided journey or practice at
+            your own pace
+          </p>
+          {realInterviewCount > 0 && (
+            <p className="mt-4 text-sm text-gray-500">
+              {realInterviewCount} real interview question
+              {realInterviewCount > 1 ? "s" : ""} collected
             </p>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">📅</span>
-            <p className="text-gray-700">
-              Organized by timeline, not by disconnected knowledge categories
-            </p>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">💡</span>
-            <p className="text-gray-700">
-              Built by someone making the same transition — I know your pain
-              points
-            </p>
-          </div>
+          )}
         </div>
 
-        {/* CTA Button */}
-        <Link
-          href="/questions"
-          className="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
-        >
-          Start Learning
-          <svg
-            className="w-5 h-5 ml-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 7l5 5m0 0l-5 5m5-5H6"
-            />
-          </svg>
-        </Link>
+        {/* Two-Column Layout */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {/* Interview Journey Card */}
+          <div className="bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-blue-200 transition-colors">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Interview Journey
+              </h2>
+              <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                Recommended
+              </span>
+            </div>
 
-        {/* Real Interview Count Badge */}
-        {realInterviewCount > 0 && (
-          <p className="mt-6 text-sm text-gray-500">
-            🎯 {realInterviewCount} real interview question
-            {realInterviewCount > 1 ? "s" : ""} collected so far — more coming
-            as I interview!
-          </p>
-        )}
-      </div>
-
-      {/* Stages Grid */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-          Learning Stages
-        </h2>
-        {stagesWithCounts.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <p className="text-gray-500">
-              No stages available yet. Run the database seed script to get
-              started.
+            <p className="text-gray-600 mb-6">
+              Follow our proven 3-stage system optimized for fastest results
             </p>
-            <code className="mt-2 inline-block text-sm bg-gray-200 px-3 py-1 rounded">
-              npm run db:seed
-            </code>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {stagesWithCounts.map((stage) => (
-              <StageCard
-                key={stage.id}
-                slug={stage.slug}
-                name={stage.name}
-                description={stage.description}
-                weekRange={stage.weekRange}
-                goal={stage.goal}
-                order={stage.order}
-                availableCount={stage.availableCount}
-                totalCount={stage.totalCount}
-              />
-            ))}
-          </div>
-        )}
-      </div>
 
-      {/* Quick Links */}
-      <div className="mb-16 grid gap-6 md:grid-cols-2">
-        <div className="bg-blue-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
-            Question Bank
-          </h3>
-          <p className="text-blue-700 mb-4">
-            Browse all available questions across all categories.
-          </p>
-          <Link
-            href="/questions"
-            className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800"
-          >
-            View all questions
-            <svg
-              className="w-4 h-4 ml-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            {/* Stage 1 Progress */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-gray-900">
+                  Stage 1: Build Portfolio
+                </h3>
+                <span className="text-sm text-gray-600">
+                  {userProgress.stage1.percentage}%
+                </span>
+              </div>
+
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all"
+                  style={{ width: `${userProgress.stage1.percentage}%` }}
+                />
+              </div>
+
+              <div className="space-y-2 text-sm">
+                <div
+                  className={`flex items-center ${
+                    userProgress.stage1.tasks.sentimentAnalysis === "completed"
+                      ? "text-green-600"
+                      : userProgress.stage1.tasks.sentimentAnalysis ===
+                          "in-progress"
+                        ? "text-blue-600"
+                        : "text-gray-400"
+                  }`}
+                >
+                  {userProgress.stage1.tasks.sentimentAnalysis ===
+                  "completed" ? (
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                    </svg>
+                  )}
+                  Sentiment Analysis
+                  {userProgress.stage1.tasks.sentimentAnalysis === "completed"
+                    ? " (Complete)"
+                    : userProgress.stage1.tasks.sentimentAnalysis ===
+                        "in-progress"
+                      ? " (In Progress)"
+                      : ""}
+                </div>
+                <div
+                  className={`flex items-center ${
+                    userProgress.stage1.tasks.imageClassification ===
+                    "completed"
+                      ? "text-green-600"
+                      : userProgress.stage1.tasks.imageClassification ===
+                          "in-progress"
+                        ? "text-blue-600"
+                        : "text-gray-400"
+                  }`}
+                >
+                  {userProgress.stage1.tasks.imageClassification ===
+                  "completed" ? (
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                    </svg>
+                  )}
+                  Image Classification
+                  {userProgress.stage1.tasks.imageClassification === "completed"
+                    ? " (Complete)"
+                    : userProgress.stage1.tasks.imageClassification ===
+                        "in-progress"
+                      ? " (In Progress)"
+                      : ""}
+                </div>
+                <div className="flex items-center text-gray-400">
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                  </svg>
+                  Recommendation System
+                </div>
+              </div>
+            </div>
+
+            {/* Stage 2 & 3 Preview */}
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
+                <span className="text-gray-500">Stage 2: Ace Screening</span>
+                <svg
+                  className="w-4 h-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
+                <span className="text-gray-500">Stage 3: Master Technical</span>
+                <svg
+                  className="w-4 h-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <Link
+              href="/interview-journey"
+              className="block w-full bg-blue-600 text-white text-center py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link>
-        </div>
-        <div className="bg-green-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-green-900 mb-2">
-            Content Roadmap
-          </h3>
-          <p className="text-green-700 mb-4">
-            See what content is available and what&apos;s coming soon.
-          </p>
-          <Link
-            href="/roadmap"
-            className="inline-flex items-center text-green-600 font-medium hover:text-green-800"
-          >
-            View roadmap
-            <svg
-              className="w-4 h-4 ml-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </Link>
-        </div>
-      </div>
+              Continue Your Journey
+              <svg
+                className="inline-block ml-2 w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </Link>
+          </div>
 
-      {/* About/Story Section */}
-      <div className="mb-16">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-          Why I Built This
-        </h2>
-        <div className="bg-gray-50 rounded-lg p-8 border-l-4 border-blue-500">
-          <div className="prose prose-gray max-w-none">
-            <p className="text-gray-700 mb-4">
-              I&apos;m a software engineer transitioning from Android/backend
-              development to ML engineering. While preparing for interviews, I
-              found that most resources were either scattered &quot;八股文&quot;
-              (rote memorization content) or theoretical material disconnected
-              from real interviews.
+          {/* Practice Library Card */}
+          <div className="bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-gray-200 transition-colors">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Practice Library
+            </h2>
+
+            <p className="text-gray-600 mb-6">
+              Access any resource instantly—perfect if you already have
+              experience
             </p>
-            <p className="text-gray-700 mb-4">
-              So I started documenting my own interview experiences and building
-              this site as I go. Every question tagged &quot;Real
-              Interview&quot; is something I personally encountered.
-            </p>
-            <p className="text-gray-700 font-medium">
-              I hope this helps others on the same journey.
-            </p>
+
+            {/* Resource Categories */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <Link
+                href="/practice-library/projects"
+                className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+              >
+                <div className="text-2xl mb-2">📁</div>
+                <div className="font-semibold text-gray-900 group-hover:text-blue-600">
+                  Projects
+                </div>
+                <div className="text-sm text-gray-500">
+                  {projectCount} available
+                </div>
+              </Link>
+
+              <Link
+                href="/practice-library/behavioral"
+                className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+              >
+                <div className="text-2xl mb-2">💬</div>
+                <div className="font-semibold text-gray-900 group-hover:text-blue-600">
+                  Behavioral
+                </div>
+                <div className="text-sm text-gray-500">{bqCount} questions</div>
+              </Link>
+
+              <Link
+                href="/practice-library/ml-concepts"
+                className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+              >
+                <div className="text-2xl mb-2">🧠</div>
+                <div className="font-semibold text-gray-900 group-hover:text-blue-600">
+                  ML Concepts
+                </div>
+                <div className="text-sm text-gray-500">15 concepts</div>
+              </Link>
+
+              <Link
+                href="/practice-library/ml-coding"
+                className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+              >
+                <div className="text-2xl mb-2">💻</div>
+                <div className="font-semibold text-gray-900 group-hover:text-blue-600">
+                  ML Coding
+                </div>
+                <div className="text-sm text-gray-500">3 problems</div>
+              </Link>
+            </div>
+
+            <Link
+              href="/practice-library"
+              className="block w-full bg-gray-800 text-white text-center py-3 rounded-lg font-medium hover:bg-gray-900 transition-colors"
+            >
+              Browse All Resources
+              <svg
+                className="inline-block ml-2 w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
+        {/* Stats Section */}
+        <div className="bg-white rounded-xl shadow p-8 mb-12">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">
+            Your Progress
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600">
+                {userProgress.stats.projectsCompleted}
+              </div>
+              <div className="text-sm text-gray-600">Projects Completed</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600">
+                {userProgress.stats.bqPracticed}
+              </div>
+              <div className="text-sm text-gray-600">BQ Practiced</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-600">
+                {userProgress.stats.dayStreak}
+              </div>
+              <div className="text-sm text-gray-600">Day Streak</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600">
+                {userProgress.stats.totalHours}
+              </div>
+              <div className="text-sm text-gray-600">Hours Total</div>
+            </div>
+          </div>
+        </div>
+
+        {/* About Section */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 border border-blue-100">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Why This Platform?
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🎯</span>
+              <div>
+                <h3 className="font-semibold text-gray-900">Real Questions</h3>
+                <p className="text-sm text-gray-600">
+                  From actual interviews, not scraped from the internet
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">📅</span>
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  Structured Journey
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Organized by timeline, not disconnected topics
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">💡</span>
+              <div>
+                <h3 className="font-semibold text-gray-900">Built for You</h3>
+                <p className="text-sm text-gray-600">
+                  By someone making the same career transition
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Email Subscription Section */}
-      <EmailSubscription />
     </div>
   );
 }
