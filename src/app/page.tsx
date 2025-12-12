@@ -4,6 +4,7 @@ import { count, eq } from "drizzle-orm";
 import { BEHAVIORAL_QUESTIONS } from "@/data/resume-ready/behavioral-questions";
 import { PROJECT_TEMPLATES } from "@/data/resume-ready/project-templates";
 import { demoProgress } from "@/types/progress";
+import { Mail, Calendar } from "lucide-react";
 
 async function getRealInterviewCount() {
   const result = await db
@@ -379,6 +380,43 @@ export default async function HomePage() {
                   By someone making the same career transition
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Professional Services CTA */}
+        <div className="mt-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-6 text-white">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            {/* Left: Value Proposition */}
+            <div className="text-center md:text-left">
+              <h3 className="text-xl font-bold mb-2">
+                Need Professional Help?
+              </h3>
+              <p className="text-blue-100 text-sm">
+                Resume review • Mock interviews • Career coaching • Custom AI
+                solutions
+              </p>
+            </div>
+
+            {/* Right: CTA Buttons */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <a
+                href="mailto:polarisaistudio@gmail.com"
+                className="inline-flex items-center px-5 py-2.5 bg-white text-blue-600 rounded-lg font-medium hover:bg-gray-100 transition-colors text-sm shadow-md"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Get in Touch
+              </a>
+
+              <a
+                href="https://calendly.com/polarisaistudio/introduction-call"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-5 py-2.5 bg-blue-700 text-white rounded-lg font-medium hover:bg-blue-800 transition-colors text-sm border border-white/20 shadow-md"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Book Consultation
+              </a>
             </div>
           </div>
         </div>
