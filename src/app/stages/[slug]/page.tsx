@@ -101,6 +101,20 @@ function ContentItemCard({ item }: { item: ContentItem }) {
 }
 
 async function getStage(slug: string) {
+  // Handle special combined "technical-rounds" page
+  if (slug === "technical-rounds") {
+    return {
+      id: -1, // Special ID for combined page
+      slug: "technical-rounds",
+      name: "Master Technical Rounds",
+      description:
+        "Deep dive into ML concepts, algorithms, and system design. Master all the technical skills needed to ace your interviews.",
+      weekRange: "Week 3-10",
+      goal: "Pass all technical rounds",
+      order: 3,
+    };
+  }
+
   const result = await db
     .select()
     .from(stages)
@@ -142,6 +156,53 @@ async function getStageContent(stageId: number) {
   return items;
 }
 
+async function getTechnicalRoundsContent() {
+  // Get stage IDs for coding-ready, ml-ready, and system-design-ready
+  const technicalStages = await db
+    .select({ id: stages.id, slug: stages.slug })
+    .from(stages)
+    .where(
+      sql`${stages.slug} IN ('coding-ready', 'ml-ready', 'system-design-ready')`,
+    );
+
+  const stageIds = technicalStages.map((s) => s.id);
+
+  if (stageIds.length === 0) {
+    return [];
+  }
+
+  const items = await db
+    .select({
+      id: contentItems.id,
+      title: contentItems.title,
+      description: contentItems.description,
+      difficulty: contentItems.difficulty,
+      isAvailable: contentItems.isAvailable,
+      order: contentItems.order,
+      contentType: {
+        slug: contentTypes.slug,
+        name: contentTypes.name,
+      },
+      question: {
+        id: questions.id,
+        sourceCompany: questions.sourceCompany,
+        isVerified: questions.isVerified,
+      },
+      project: {
+        id: projects.id,
+        estimatedHours: projects.estimatedHours,
+      },
+    })
+    .from(contentItems)
+    .leftJoin(contentTypes, eq(contentItems.contentTypeId, contentTypes.id))
+    .leftJoin(questions, eq(contentItems.id, questions.contentItemId))
+    .leftJoin(projects, eq(contentItems.id, projects.contentItemId))
+    .where(sql`${contentItems.stageId} IN ${stageIds}`)
+    .orderBy(contentItems.order);
+
+  return items;
+}
+
 async function getStageCounts(stageId: number) {
   const result = await db
     .select({
@@ -157,6 +218,34 @@ async function getStageCounts(stageId: number) {
   };
 }
 
+async function getTechnicalRoundsCounts() {
+  const technicalStages = await db
+    .select({ id: stages.id })
+    .from(stages)
+    .where(
+      sql`${stages.slug} IN ('coding-ready', 'ml-ready', 'system-design-ready')`,
+    );
+
+  const stageIds = technicalStages.map((s) => s.id);
+
+  if (stageIds.length === 0) {
+    return { total: 0, available: 0 };
+  }
+
+  const result = await db
+    .select({
+      total: count(),
+      available: sql<number>`count(*) filter (where ${contentItems.isAvailable} = true)`,
+    })
+    .from(contentItems)
+    .where(sql`${contentItems.stageId} IN ${stageIds}`);
+
+  return {
+    total: Number(result[0]?.total ?? 0),
+    available: Number(result[0]?.available ?? 0),
+  };
+}
+
 export default async function StagePage({ params }: Props) {
   const { slug } = await params;
   const stage = await getStage(slug);
@@ -165,9 +254,12 @@ export default async function StagePage({ params }: Props) {
     notFound();
   }
 
+  // Handle technical-rounds combined page
+  const isTechnicalRounds = slug === "technical-rounds";
+
   const [content, counts] = await Promise.all([
-    getStageContent(stage.id),
-    getStageCounts(stage.id),
+    isTechnicalRounds ? getTechnicalRoundsContent() : getStageContent(stage.id),
+    isTechnicalRounds ? getTechnicalRoundsCounts() : getStageCounts(stage.id),
   ]);
 
   return (
@@ -219,6 +311,119 @@ export default async function StagePage({ params }: Props) {
           title="No content yet"
           description="Content for this stage is coming soon. Check back later!"
         />
+      ) : slug === "technical-rounds" ? (
+        // Technical Rounds: combined view with Algorithms, ML, and System Design
+        <div className="space-y-10">
+          {/* Algorithms Section */}
+          {(() => {
+            const algorithms = content.filter(
+              (item) => item.contentType?.slug === "algorithm_problem",
+            );
+            if (algorithms.length === 0) return null;
+            return (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">⚡</span>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Algorithms & Data Structures
+                  </h2>
+                  <Badge variant="info">{algorithms.length}</Badge>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Master LeetCode-style problems commonly asked in ML/AI
+                  interviews. Focus on patterns and problem-solving strategies.
+                </p>
+                <div className="space-y-3">
+                  {algorithms.map((item) => (
+                    <ContentItemCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ML Concepts Section */}
+          {(() => {
+            const mlConcepts = content.filter(
+              (item) => item.contentType?.slug === "ml_concept",
+            );
+            if (mlConcepts.length === 0) return null;
+            return (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">🧠</span>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    ML Concepts
+                  </h2>
+                  <Badge variant="info">{mlConcepts.length}</Badge>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Master the theoretical foundations - common interview
+                  questions about ML concepts, algorithms, and theory.
+                </p>
+                <div className="space-y-3">
+                  {mlConcepts.map((item) => (
+                    <ContentItemCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ML Coding Section */}
+          {(() => {
+            const mlCoding = content.filter(
+              (item) => item.contentType?.slug === "ml_coding",
+            );
+            if (mlCoding.length === 0) return null;
+            return (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">💻</span>
+                  <h2 className="text-xl font-bold text-gray-900">ML Coding</h2>
+                  <Badge variant="info">{mlCoding.length}</Badge>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Implement ML algorithms from scratch - gradient descent,
+                  regularization, neural networks, and more.
+                </p>
+                <div className="space-y-3">
+                  {mlCoding.map((item) => (
+                    <ContentItemCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* System Design Section */}
+          {(() => {
+            const systemDesign = content.filter(
+              (item) => item.contentType?.slug === "system_design",
+            );
+            if (systemDesign.length === 0) return null;
+            return (
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">🏗️</span>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    System Design
+                  </h2>
+                  <Badge variant="info">{systemDesign.length}</Badge>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Learn to design ML systems at scale - recommendation systems,
+                  search ranking, fraud detection, and more.
+                </p>
+                <div className="space-y-3">
+                  {systemDesign.map((item) => (
+                    <ContentItemCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
       ) : slug === "ml-ready" ? (
         // ML Ready stage: separate into ML Concepts and ML Coding sections
         <div className="space-y-8">

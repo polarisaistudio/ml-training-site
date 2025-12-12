@@ -9,7 +9,7 @@ export default function InterviewJourneyPage() {
     {
       id: 1,
       title: "Build Your Portfolio",
-      duration: "2-3 weeks",
+      duration: "1-2 weeks",
       status: userProgress.stage1.status,
       progress: userProgress.stage1.percentage,
       description:
@@ -19,6 +19,7 @@ export default function InterviewJourneyPage() {
         "Resume bullets that get interviews",
         "Confident project presentations",
       ],
+      link: "/stages/resume-ready",
       tasks: [
         {
           id: 1,
@@ -52,25 +53,43 @@ export default function InterviewJourneyPage() {
       description:
         "Master behavioral questions and technical screening to land onsite interviews.",
       achievements: [
-        "20 behavioral questions prepared",
-        "Technical screening answers ready",
-        "Company research completed",
+        "20+ behavioral questions prepared",
+        "STAR format answers ready",
+        "Confident storytelling skills",
       ],
+      link: "/resume-ready/interview-prep",
       tasks: [],
     },
     {
       id: 3,
       title: "Master Technical Rounds",
-      duration: "2-3 weeks",
+      duration: "3-4 weeks",
       status: userProgress.stage3.status,
       progress: userProgress.stage3.percentage,
       description:
-        "Deep dive into ML concepts and coding problems for technical interviews.",
+        "Deep dive into ML concepts, algorithms, and system design for technical interviews.",
       achievements: [
-        "15 ML concepts mastered",
-        "20 coding problems solved",
+        "ML concepts mastered",
+        "Algorithm problems solved",
         "System design practice",
       ],
+      link: "/stages/technical-rounds",
+      tasks: [],
+    },
+    {
+      id: 4,
+      title: "Mock Interview Practice",
+      duration: "Ongoing",
+      status: "locked" as const,
+      progress: 0,
+      description:
+        "Put it all together with mock interview sets. Build interview stamina and refine your presentation.",
+      achievements: [
+        "Full interview simulations",
+        "Timed practice sessions",
+        "Interview stamina built",
+      ],
+      link: "/stages/mock-interview",
       tasks: [],
     },
   ];
@@ -84,7 +103,7 @@ export default function InterviewJourneyPage() {
             Your Interview Journey
           </h1>
           <p className="text-xl text-gray-600">
-            Follow this proven 3-stage system for ML interview success
+            Follow this proven 4-stage system for ML interview success
           </p>
           <div className="mt-4 flex items-center text-sm text-gray-500">
             <svg
@@ -100,7 +119,7 @@ export default function InterviewJourneyPage() {
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            Total Duration: 5-7 weeks • Stage 1 of 3 •{" "}
+            Total Duration: 6-8 weeks • Stage 1 of 4 •{" "}
             {userProgress.stage1.percentage}% Complete
           </div>
         </div>
@@ -351,36 +370,28 @@ export default function InterviewJourneyPage() {
                       Complete Stage {stage.id - 1} to Unlock
                     </button>
                   ) : isInProgress ? (
-                    <>
-                      {stage.tasks.find((t) => t.status === "in-progress")
-                        ?.link && (
-                        <Link
-                          href={
-                            stage.tasks.find((t) => t.status === "in-progress")
-                              ?.link || "#"
-                          }
-                          className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center"
-                        >
-                          Continue Stage {stage.id}
-                          <svg
-                            className="ml-2 w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M13 7l5 5m0 0l-5 5m5-5H6"
-                            />
-                          </svg>
-                        </Link>
-                      )}
-                    </>
+                    <Link
+                      href={stage.link}
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center"
+                    >
+                      Continue Stage {stage.id}
+                      <svg
+                        className="ml-2 w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"
+                        />
+                      </svg>
+                    </Link>
                   ) : (
                     <Link
-                      href={`/interview-journey/stage-${stage.id}`}
+                      href={stage.link}
                       className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300"
                     >
                       Review Stage {stage.id}
