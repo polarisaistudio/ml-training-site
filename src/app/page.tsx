@@ -35,12 +35,9 @@ export default async function HomePage() {
             Choose your learning style: Follow the guided journey or practice at
             your own pace
           </p>
-          {realInterviewCount > 0 && (
-            <p className="mt-4 text-sm text-gray-500">
-              {realInterviewCount} real interview question
-              {realInterviewCount > 1 ? "s" : ""} collected
-            </p>
-          )}
+          <p className="mt-4 text-sm text-gray-500">
+            Real interview questions from 2024/2025 AI/ML interviews
+          </p>
         </div>
 
         {/* Two-Column Layout */}
@@ -247,7 +244,7 @@ export default async function HomePage() {
             {/* Resource Categories */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <Link
-                href="/practice-library/projects"
+                href="/resume-ready/projects"
                 className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
               >
                 <div className="text-2xl mb-2">📁</div>
@@ -260,36 +257,36 @@ export default async function HomePage() {
               </Link>
 
               <Link
-                href="/practice-library/behavioral"
-                className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                href="/resume-ready/interview-prep"
+                className="p-4 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all group"
               >
                 <div className="text-2xl mb-2">💬</div>
-                <div className="font-semibold text-gray-900 group-hover:text-blue-600">
+                <div className="font-semibold text-gray-900 group-hover:text-green-600">
                   Behavioral
                 </div>
                 <div className="text-sm text-gray-500">{bqCount} questions</div>
               </Link>
 
               <Link
-                href="/practice-library/ml-concepts"
-                className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                href="/stages/ml-ready"
+                className="p-4 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all group"
               >
                 <div className="text-2xl mb-2">🧠</div>
-                <div className="font-semibold text-gray-900 group-hover:text-blue-600">
-                  ML Concepts
+                <div className="font-semibold text-gray-900 group-hover:text-purple-600">
+                  ML Questions
                 </div>
-                <div className="text-sm text-gray-500">15 concepts</div>
+                <div className="text-sm text-gray-500">18 questions</div>
               </Link>
 
               <Link
-                href="/practice-library/ml-coding"
-                className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                href="/stages/coding-ready"
+                className="p-4 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all group"
               >
                 <div className="text-2xl mb-2">💻</div>
-                <div className="font-semibold text-gray-900 group-hover:text-blue-600">
-                  ML Coding
+                <div className="font-semibold text-gray-900 group-hover:text-orange-600">
+                  Algorithms
                 </div>
-                <div className="text-sm text-gray-500">3 problems</div>
+                <div className="text-sm text-gray-500">20 problems</div>
               </Link>
             </div>
 

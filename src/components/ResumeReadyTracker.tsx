@@ -549,7 +549,7 @@ export function ResumeReadyTracker() {
         </Link>
       </div>
 
-      {/* Cover Letter Guide Section */}
+      {/* Application Materials Section */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">
           Application Materials
@@ -559,40 +559,80 @@ export function ResumeReadyTracker() {
           materials.
         </p>
 
-        <Link href="/resume-ready/cover-letter-guide">
-          <Card className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.01] hover:border-green-300 group">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="text-4xl flex-shrink-0 group-hover:scale-110 transition-transform">
-                  📝
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-lg mb-1 group-hover:text-green-600 transition-colors">
-                    Cover Letter Writing Guide
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-3">
-                    Complete guide with templates for startups, big tech, and
-                    research labs. Includes examples using your ML projects.
-                  </p>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="secondary" className="text-xs">
-                      3 Templates
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                      Company Research Tips
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                      Common Mistakes
-                    </Badge>
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Resume Writing Guide Card */}
+          <Link href="/resume-ready/resume-writing-guide">
+            <Card className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.01] hover:border-blue-300 group h-full">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="text-4xl flex-shrink-0 group-hover:scale-110 transition-transform">
+                    📄
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-lg mb-1 group-hover:text-blue-600 transition-colors">
+                      Resume Writing Guide
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Comprehensive guide to crafting ATS-friendly ML/AI
+                      resumes. Includes bullet formulas, examples by career
+                      stage, and optimization tips.
+                    </p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="secondary" className="text-xs">
+                        ATS Optimization
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        Bullet Formulas
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        Career Stage Examples
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all flex-shrink-0">
+                    →
                   </div>
                 </div>
-                <div className="text-gray-400 group-hover:text-green-500 group-hover:translate-x-1 transition-all flex-shrink-0">
-                  →
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Cover Letter Writing Guide Card */}
+          <Link href="/resume-ready/cover-letter-guide">
+            <Card className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.01] hover:border-green-300 group h-full">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="text-4xl flex-shrink-0 group-hover:scale-110 transition-transform">
+                    📝
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-lg mb-1 group-hover:text-green-600 transition-colors">
+                      Cover Letter Writing Guide
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Complete guide with templates for startups, big tech, and
+                      research labs. Includes examples using your ML projects.
+                    </p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="secondary" className="text-xs">
+                        3 Templates
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        Company Research Tips
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        Common Mistakes
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="text-gray-400 group-hover:text-green-500 group-hover:translate-x-1 transition-all flex-shrink-0">
+                    →
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
       </div>
 
       {/* Projects Grid */}
